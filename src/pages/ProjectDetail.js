@@ -1,4 +1,4 @@
-import { detail } from "../components/detail";
+import { detail } from "../components/detail.js";
 
 export const ProjectDetail = ({ projectDetail, loading, otherProducts, count }) => {
   return /*html*/ `

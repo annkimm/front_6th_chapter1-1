@@ -1,6 +1,6 @@
-import { LoadingProduct } from "../components/LoadingProduct";
-import { List } from "../components/List";
-import { FirstCategory } from "../components/FirstCategory";
+import { LoadingProduct } from "../components/LoadingProduct.js";
+import { List } from "../components/List.js";
+import { FirstCategory } from "../components/FirstCategory.js";
 
 export const Main = ({ pagination = {}, products = [], category = {}, filters = {}, isLoading = false }) => {
   const categoryList = Object.keys(category);

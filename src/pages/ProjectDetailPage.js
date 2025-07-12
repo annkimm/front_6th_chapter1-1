@@ -1,6 +1,6 @@
-import { ProjectDetail } from "./ProjectDetail";
-import { getProduct, getProducts } from "../api/productApi";
-import { _404_ } from "./NotFoundPage";
+import { ProjectDetail } from "./ProjectDetail.js";
+import { getProduct, getProducts } from "../api/productApi.js";
+import { _404_ } from "./NotFoundPage.js";
 
 let projectDetailState = {
   loading: false,

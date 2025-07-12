@@ -1,6 +1,6 @@
-import { getProducts, getCategories } from "../api/productApi";
+import { getProducts, getCategories } from "../api/productApi.js";
 import { router } from "../main";
-import { Main } from "./Main";
+import { Main } from "./Main.js";
 
 let state = {
   products: [],
