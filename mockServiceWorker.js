@@ -326,7 +326,7 @@ function respondWithMock(response) {
  */
 async function serializeRequest(request) {
   return {
-    url: request.url,
+    url: "/front_6th_chapter1-1/" + request.url,
     mode: request.mode,
     method: request.method,
     headers: Object.fromEntries(request.headers.entries()),
