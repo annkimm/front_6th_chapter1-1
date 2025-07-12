@@ -1,4 +1,4 @@
-import { ProductItem } from "./Product";
+import { ProductItem } from "./Product.js";
 
 export const List = (productList, total) => {
   return /* HTML */ `
