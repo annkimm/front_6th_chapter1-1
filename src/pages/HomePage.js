@@ -1,5 +1,5 @@
 import { getProducts, getCategories } from "../api/productApi.js";
-import { router } from "../main";
+import { router } from "../main.js";
 import { Main } from "./Main.js";
 
 let state = {
