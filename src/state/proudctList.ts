@@ -2,13 +2,20 @@ import { getCategories, getProducts } from "../api/productApi";
 import { router } from "../router";
 import { Filters, Pagination, Product } from "../type";
 
-let productState = {
+const createInitialState = () => ({
   loading: true,
   products: [] as Array<Product>,
   pagination: {} as Pagination,
   filters: {} as Filters,
   categories: {} as { [key: string]: {} },
   search: "",
+});
+
+let productState = createInitialState();
+
+// 상태 초기화 함수 (테스트 간 격리를 위해 필요)
+export const resetProductListState = () => {
+  productState = createInitialState();
 };
 
 export const getProductList = () => {

@@ -4,13 +4,19 @@ import { card } from "./card.js";
 import { searchBar } from "./searchBar.js";
 import { skeleton } from "../../components/skeleton.js";
 import { loading } from "./loading.js";
-import { getProductList } from "../../state/proudctList.js";
+import { getProductList, resetProductListState } from "../../state/proudctList.js";
 
 let inputController: AbortController | null = null;
 let changeController: AbortController | null = null;
 
 export const productList = () => {
   const { state, getProudcts } = getProductList();
+
+  // DOM이 비어있으면 이전 테스트가 정리한 것이므로 상태 리셋
+  const root = document.getElementById("root");
+  if (root) {
+    resetProductListState();
+  }
 
   // 초기 로딩
   if (state.loading && Object.keys(state.pagination).length === 0) {
