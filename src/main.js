@@ -1,4 +1,4 @@
-import { router } from "./router.js";
+import { router } from "./router.ts";
 
 const enableMocking = () =>
   import("./mocks/browser.js").then(({ worker }) =>
