@@ -1,0 +1,19 @@
+import { getCurrentIcon } from "./utils.js";
+
+export const toast = (color: string, text: string) => {
+  return `
+    <div class="flex flex-col gap-2 items-center justify-center mx-auto" style="width: fit-content;">
+      <div class="bg-${color}-600 text-white px-4 py-3 rounded-lg shadow-lg flex items-center space-x-2 max-w-sm">
+        <div class="flex-shrink-0">
+          ${getCurrentIcon(color)}
+        </div>
+        <p class="text-sm font-medium">${text}</p>
+        <button id="toast-close-btn" class="flex-shrink-0 ml-2 text-white hover:text-gray-200">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+        `;
+};
