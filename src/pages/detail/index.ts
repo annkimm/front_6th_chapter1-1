@@ -31,7 +31,7 @@ export const productDetail = (id: string) => {
       "related-product-card": (_e: Event, element: HTMLElement) => {
         const productId = element.getAttribute("data-product-id");
         if (productId) {
-          router().push(`/detail/${productId}`);
+          router().push(`/product/${productId}`);
         }
       },
     },

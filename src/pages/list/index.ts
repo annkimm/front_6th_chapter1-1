@@ -78,7 +78,7 @@ export const productList = () => {
       "product-image": (_e: Event, element: HTMLElement) => {
         const productId = (element.closest("[data-product-id]") as HTMLElement)?.dataset.productId;
         if (productId) {
-          router().push(`/detail/${productId}`);
+          router().push(`/product/${productId}`);
         }
       },
     },
