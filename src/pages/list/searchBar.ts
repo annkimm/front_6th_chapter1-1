@@ -65,21 +65,23 @@ export const searchBar = (
                   ? ""
                   : filter.category1.length > 0
                     ? `
-                <!-- 2depth 카테고리 -->
-                <!-- 카테고리 있을 때 -->
-                <div class="space-y-2">
-                  <div class="flex flex-wrap gap-2">
-                    ${Object.keys(categories[filter.category1]).map(
-                      (category) => `
-                      <button data-category1="${filter.category1}" data-category2="${category}" class="category2-filter-btn text-left px-3 py-2 text-sm rounded-md border transition-colors bg-white border-gray-300 text-gray-700 hover:bg-gray-50">
-                        ${category}
-                      </button>  
-                    `,
-                    )}
-                  </div>
-                </div>
-                <!-- 카테고리 있을 때 // -->
-              `
+                      <!-- 2depth 카테고리 -->
+                      <!-- 카테고리 있을 때 -->
+                      <div class="space-y-2">
+                        <div class="flex flex-wrap gap-2">
+                          ${Object.keys(categories[filter.category1])
+                            .map(
+                              (category) => `
+                            <button data-category1="${filter.category1}" data-category2="${category}" class="category2-filter-btn text-left px-3 py-2 text-sm rounded-md border transition-colors bg-white ${filter.category2 === category ? `bg-blue-100 border-blue-300 text-blue-800` : `border-gray-300 text-gray-700 hover:bg-gray-50`}">
+                              ${category}
+                            </button>  
+                          `,
+                            )
+                            .join("")}
+                        </div>
+                      </div>
+                      <!-- 카테고리 있을 때 // -->
+                    `
                     : ``
               }
             </div>

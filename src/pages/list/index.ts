@@ -81,6 +81,30 @@ export const productList = () => {
           router().push(`/product/${productId}`);
         }
       },
+      "category1-filter-btn": (_e: Event, element: HTMLElement) => {
+        const category1 = (element.closest("[data-category1]") as HTMLElement)?.dataset.category1;
+        if (category1) {
+          getProudcts({
+            limit: state.pagination.limit,
+            search: state.search,
+            category1: category1,
+            category2: state.filters.category2,
+            sort: state.filters.sort,
+          });
+        }
+      },
+      "category2-filter-btn": (_e: Event, element: HTMLElement) => {
+        const category2 = (element.closest("[data-category2]") as HTMLElement)?.dataset.category2;
+        if (category2) {
+          getProudcts({
+            limit: state.pagination.limit,
+            search: state.search,
+            category1: state.filters.category1,
+            category2: category2,
+            sort: state.filters.sort,
+          });
+        }
+      },
     },
   })();
 
