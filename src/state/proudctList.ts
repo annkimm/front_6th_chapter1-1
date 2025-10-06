@@ -11,12 +11,23 @@ const createInitialState = () => ({
   search: "",
 });
 
-let productState = createInitialState();
+const createProductListManager = () => {
+  let state = createInitialState();
 
-// 상태 초기화 함수 (테스트 간 격리를 위해 필요)
-export const resetProductListState = () => {
-  productState = createInitialState();
+  return {
+    getState: () => state,
+    setState: (newState: Partial<ReturnType<typeof createInitialState>>) => {
+      state = { ...state, ...newState };
+    },
+    reset: () => {
+      state = createInitialState();
+    },
+  };
 };
+
+const manager = createProductListManager();
+
+export const resetProductListState = manager.reset;
 
 export const getProductList = () => {
   const getProudcts = async (params: {
@@ -26,22 +37,26 @@ export const getProductList = () => {
     category2: string;
     sort: string;
   }) => {
-    productState.loading = true;
+    manager.setState({ loading: true });
+
     const result = await getProducts(params);
     const categories = await getCategories();
     console.log(categories);
 
-    productState.loading = false;
-    productState.products = result.products;
-    productState.pagination = result.pagination;
-    productState.filters = result.filters;
-    productState.categories = categories;
+    manager.setState({
+      loading: false,
+      products: result.products,
+      pagination: result.pagination,
+      filters: result.filters,
+      categories: categories,
+    });
+
     // 여기서 리렌더링!
     router().render();
   };
 
   return {
-    state: productState,
+    state: manager.getState(),
     getProudcts,
   };
 };
