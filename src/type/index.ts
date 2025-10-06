@@ -15,6 +15,14 @@ export interface Product {
   category4: string;
 }
 
+export interface ProductItem extends Product {
+  description: string;
+  rating: number;
+  reviewCount: number;
+  stock: number;
+  images: Array<string>;
+}
+
 export interface Pagination {
   page: number;
   limit: number;

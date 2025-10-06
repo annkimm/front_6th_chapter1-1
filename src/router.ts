@@ -53,17 +53,15 @@ export const router = () => {
     const root = document.getElementById("root");
     if (root) {
       root.innerHTML = html;
+      // DOM 변경 이벤트 발생
+      root.dispatchEvent(new Event("DOMContentLoaded", { bubbles: true }));
     }
     return html;
   };
 
   const push = (path: string) => {
     window.history.pushState(null, "", path);
-    const html = render(path);
-    const root = document.getElementById("root");
-    if (root) {
-      root.innerHTML = html;
-    }
+    render(path);
   };
 
   return { render, push };
