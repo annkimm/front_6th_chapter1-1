@@ -8,22 +8,34 @@ import { products } from "./products.ts";
 import { router } from "../../router.ts";
 import { createEventDelegation } from "../../utils/eventDelegation.ts";
 
-const loadInitialProductDetail = (state: any, getProductDetail: any, id: string, setState: any) => {
+let hasCheckedStaleData = false;
+
+const loadInitialProductDetail = (
+  state: any,
+  getProductDetail: any,
+  getRelatedProducts: any,
+  id: string,
+  setState: any,
+) => {
   const shouldLoad = Object.keys(state.product).length === 0 || state.product.productId !== id;
 
   if (shouldLoad) {
-    getProductDetail(id);
-  } else if (state.productList.length > 0) {
-    // 같은 상품인데 productList가 있으면 이전 세션의 데이터 -> 초기화 필요
-    setState({ productList: [] });
-    getProductDetail(id);
+    // 새 상품 로드
+    getProductDetail(id).then(() => {
+      getRelatedProducts(id);
+    });
+  } else if (!state.loadingRelated && state.productList.length > 0) {
+    // 같은 상품인데 관련 상품이 이미 로드된 상태 = 이전 세션 데이터
+    // 관련 상품만 다시 로드
+    setState({ loadingRelated: true, productList: [] });
+    getRelatedProducts(id);
   }
 };
 
 export const productDetail = (id: string) => {
-  const { state, getProductDetail, setState } = getProductItemDetail();
+  const { state, getProductDetail, getRelatedProducts, setState } = getProductItemDetail();
 
-  loadInitialProductDetail(state, getProductDetail, id, setState);
+  loadInitialProductDetail(state, getProductDetail, getRelatedProducts, id, setState);
 
   createEventDelegation({
     clickByClass: {
@@ -36,8 +48,8 @@ export const productDetail = (id: string) => {
     },
   })();
 
-  // 렌더링 시점에 productList 결정: loading 중이거나 다른 상품이면 빈 배열
-  const currentProductList = state.loading || state.product.productId !== id ? [] : state.productList;
+  // 관련 상품은 loadingRelated가 false일 때만 표시
+  const currentProductList = state.loadingRelated ? [] : state.productList;
 
   return `${header(true)}
             <main class="max-w-md mx-auto px-4 py-4">
