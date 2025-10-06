@@ -6,6 +6,7 @@ import { getProductItemDetail, resetProductState } from "../../state/proudcDetai
 import { breadcrumb } from "./breadcrumb.ts";
 import { products } from "./products.ts";
 import { router } from "../../router.ts";
+import { createEventDelegation } from "../../utils/eventDelegation.ts";
 
 const ensureCleanState = () => {
   const root = document.getElementById("root");
@@ -24,6 +25,17 @@ export const productDetail = (id: string) => {
   const { state, getProductDetail } = getProductItemDetail();
   ensureCleanState();
   loadInitialProductDetail(state, getProductDetail, id);
+
+  createEventDelegation({
+    clickByClass: {
+      "related-product-card": (_e: Event, element: HTMLElement) => {
+        const productId = element.getAttribute("data-product-id");
+        if (productId) {
+          router().push(`/detail/${productId}`);
+        }
+      },
+    },
+  })();
 
   return `${header(true)}
             <main class="max-w-md mx-auto px-4 py-4">

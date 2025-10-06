@@ -34,6 +34,7 @@ export const productList = () => {
 
   ensureCleanState();
   loadInitialProducts(state, getProudcts);
+
   createEventDelegation({
     input: {
       "search-input": (e: Event) => {
@@ -74,7 +75,7 @@ export const productList = () => {
       },
     },
     clickByClass: {
-      "product-image": (e, element) => {
+      "product-image": (_e: Event, element: HTMLElement) => {
         const productId = (element.closest("[data-product-id]") as HTMLElement)?.dataset.productId;
         if (productId) {
           router().push(`/detail/${productId}`);

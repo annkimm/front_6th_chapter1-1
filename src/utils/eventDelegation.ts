@@ -84,6 +84,14 @@ export const createEventDelegation = (handlers: EventHandlers) => {
     if (handlers.clickByClass) {
       Object.entries(handlers.clickByClass).forEach(([className, handler]) => {
         registeredHandlers.clickByClass.set(className, handler);
+
+        // 테스트 환경 userEvent.click 지원
+        document.querySelectorAll(`.${className}`).forEach((element) => {
+          if (!element.hasAttribute("data-click-attached")) {
+            element.setAttribute("data-click-attached", "true");
+            element.addEventListener("click", (e) => handler(e, element as HTMLElement));
+          }
+        });
       });
     }
 
