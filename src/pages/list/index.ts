@@ -39,6 +39,19 @@ export const productList = () => {
         state.search = (e.target as HTMLInputElement).value;
       },
     },
+    keydown: {
+      "search-input": (e: KeyboardEvent) => {
+        if (e.key === "Enter") {
+          getProudcts({
+            limit: Number((e.target as HTMLInputElement).value) ?? 20,
+            search: state.search,
+            category1: state.filters.category1,
+            category2: state.filters.category2,
+            sort: state.filters.sort,
+          });
+        }
+      },
+    },
     change: {
       "limit-select": (e: Event) => {
         getProudcts({
