@@ -3,7 +3,7 @@ import { productDetail } from "./pages/detail/index.js";
 
 const routes = {
   "/": productList,
-  "/product/:id": productDetail,
+  "/detail/:id": productDetail,
 };
 
 export const router = () => {

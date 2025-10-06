@@ -41,7 +41,6 @@ export const getProductList = () => {
 
     const result = await getProducts(params);
     const categories = await getCategories();
-    console.log(categories);
 
     manager.setState({
       loading: false,

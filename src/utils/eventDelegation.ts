@@ -2,6 +2,7 @@ type EventHandlers = {
   input?: Record<string, (e: Event) => void>;
   change?: Record<string, (e: Event) => void>;
   click?: Record<string, (e: Event) => void>;
+  clickByClass?: Record<string, (e: Event, element: HTMLElement) => void>;
   keydown?: Record<string, (e: KeyboardEvent) => void>;
 };
 
@@ -9,11 +10,13 @@ const registeredHandlers: {
   input: Map<string, (e: Event) => void>;
   change: Map<string, (e: Event) => void>;
   click: Map<string, (e: Event) => void>;
+  clickByClass: Map<string, (e: Event, element: HTMLElement) => void>;
   keydown: Map<string, (e: KeyboardEvent) => void>;
 } = {
   input: new Map(),
   change: new Map(),
   click: new Map(),
+  clickByClass: new Map(),
   keydown: new Map(),
 };
 
@@ -33,8 +36,19 @@ const initializeGlobalListeners = () => {
   });
 
   document.addEventListener("click", (e: Event) => {
-    const id = (e.target as HTMLElement).id;
+    const target = e.target as HTMLElement;
+    const id = target.id;
+
+    // ID 기반 클릭 처리
     registeredHandlers.click.get(id)?.(e);
+
+    // 클래스 기반 클릭 처리
+    registeredHandlers.clickByClass.forEach((handler, className) => {
+      const element = target.closest(`.${className}`) as HTMLElement;
+      if (element) {
+        handler(e, element);
+      }
+    });
   });
 
   document.addEventListener("keydown", (e: KeyboardEvent) => {
@@ -64,6 +78,12 @@ export const createEventDelegation = (handlers: EventHandlers) => {
     if (handlers.click) {
       Object.entries(handlers.click).forEach(([id, handler]) => {
         registeredHandlers.click.set(id, handler);
+      });
+    }
+
+    if (handlers.clickByClass) {
+      Object.entries(handlers.clickByClass).forEach(([className, handler]) => {
+        registeredHandlers.clickByClass.set(className, handler);
       });
     }
 

@@ -6,6 +6,7 @@ import { skeleton } from "../../components/skeleton.js";
 import { loading } from "./loading.js";
 import { getProductList, resetProductListState } from "../../state/proudctList.js";
 import { createEventDelegation } from "../../utils/eventDelegation.js";
+import { router } from "../../router.js";
 
 // 상태 초기화 로직
 const ensureCleanState = () => {
@@ -70,6 +71,14 @@ export const productList = () => {
           category2: state.filters.category2,
           sort: (e.target as HTMLInputElement).value ?? "price_asc",
         });
+      },
+    },
+    clickByClass: {
+      "product-image": (e, element) => {
+        const productId = (element.closest("[data-product-id]") as HTMLElement)?.dataset.productId;
+        if (productId) {
+          router().push(`/detail/${productId}`);
+        }
       },
     },
   })();
