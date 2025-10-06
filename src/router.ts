@@ -1,5 +1,6 @@
 import { productList } from "./pages/list/index.js";
 import { productDetail } from "./pages/detail/index.js";
+import { errorPage } from "./pages/error/index.js";
 
 const routes = {
   "/": productList,
@@ -46,7 +47,7 @@ export const router = () => {
           break; // 찾았으니 루프 종료
         }
       }
-      html = routes[key](params);
+      html = routes[key](params) ?? errorPage();
     }
 
     // DOM 업데이트
