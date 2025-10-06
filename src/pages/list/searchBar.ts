@@ -1,5 +1,5 @@
 import { Filters } from "../../type";
-import { limit, sort } from "./constant";
+import { limit, sort } from "./constants";
 
 export const searchBar = (
   loading: boolean,
