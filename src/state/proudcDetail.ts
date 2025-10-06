@@ -29,7 +29,7 @@ export const resetProductState = product.reset;
 export const getProductItemDetail = () => {
   const getProductDetail = async (id: string) => {
     try {
-      product.setState({ loading: true });
+      product.setState({ loading: true, productList: [] });
 
       // 1단계: 상품 상세 정보 로드
       const productDetail = (await getProduct(id)) as ProductItem;
