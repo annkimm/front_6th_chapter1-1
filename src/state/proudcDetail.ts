@@ -28,31 +28,35 @@ export const resetProductState = product.reset;
 
 export const getProductItemDetail = () => {
   const getProductDetail = async (id: string) => {
-    product.setState({ loading: true });
+    try {
+      product.setState({ loading: true });
 
-    // 1단계: 상품 상세 정보 로드
-    const productDetail = (await getProduct(id)) as ProductItem;
-    product.setState({
-      loading: false,
-      product: productDetail,
-      productList: [],
-    });
-    router().render();
+      // 1단계: 상품 상세 정보 로드
+      const productDetail = (await getProduct(id)) as ProductItem;
+      product.setState({
+        loading: false,
+        product: productDetail,
+        productList: [],
+      });
+      router().render();
 
-    // 2단계: 관련 상품 로드
-    const products = await getProducts({
-      limit: 20,
-      page: 1,
-      category1: productDetail.category1,
-      category2: productDetail.category2,
-      sort: "price_asc",
-    });
+      // 2단계: 관련 상품 로드
+      const products = await getProducts({
+        limit: 20,
+        page: 1,
+        category1: productDetail.category1,
+        category2: productDetail.category2,
+        sort: "price_asc",
+      });
 
-    product.setState({
-      productList: ((products.products ?? []) as Array<Product>).filter((item) => item.productId !== id),
-    });
+      product.setState({
+        productList: ((products.products ?? []) as Array<Product>).filter((item) => item.productId !== id),
+      });
 
-    router().render();
+      router().render();
+    } catch (error) {
+      router().push("/error");
+    }
   };
 
   return {

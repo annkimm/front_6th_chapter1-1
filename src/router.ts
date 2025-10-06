@@ -5,10 +5,15 @@ import { errorPage } from "./pages/error/index.js";
 const routes = {
   "/": productList,
   "/product/:id": productDetail,
+  "/error": errorPage,
 };
 
 export const router = () => {
   const render = (path?: string) => {
+    console.log("err");
+
+    console.log(path);
+
     const link = path ? path : location.pathname;
     const pathnames = link.split("/");
     let key = "";
@@ -47,7 +52,8 @@ export const router = () => {
           break; // 찾았으니 루프 종료
         }
       }
-      html = routes[key](params) ?? errorPage();
+
+      html = key ? routes[key](params) : routes["/error"]();
     }
 
     // DOM 업데이트

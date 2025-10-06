@@ -39,19 +39,23 @@ export const getProductList = () => {
   }) => {
     manager.setState({ loading: true });
 
-    const result = await getProducts(params);
-    const categories = await getCategories();
+    try {
+      const result = await getProducts(params);
+      const categories = await getCategories();
 
-    manager.setState({
-      loading: false,
-      products: result.products,
-      pagination: result.pagination,
-      filters: result.filters,
-      categories: categories,
-    });
+      manager.setState({
+        loading: false,
+        products: result.products,
+        pagination: result.pagination,
+        filters: result.filters,
+        categories: categories,
+      });
 
-    // 여기서 리렌더링!
-    router().render();
+      // 여기서 리렌더링!
+      router().render();
+    } catch (error) {
+      router().render("/error");
+    }
   };
 
   return {
