@@ -39,40 +39,32 @@ export const getProductItemDetail = () => {
         product: productDetail,
       });
       router().render();
-    } catch (error) {
-      router().push("/error");
-    }
-  };
-
-  const getRelatedProducts = async (id: string) => {
-    try {
-      const currentProduct = product.getState().product;
-      if (!currentProduct.category1) return;
 
       // 관련 상품 로드
-      const products = await getProducts({
-        limit: 20,
-        page: 1,
-        category1: currentProduct.category1,
-        category2: currentProduct.category2,
-        sort: "price_asc",
-      });
+      if (productDetail.category1) {
+        const products = await getProducts({
+          limit: 20,
+          page: 1,
+          category1: productDetail.category1,
+          category2: productDetail.category2,
+          sort: "price_asc",
+        });
 
-      product.setState({
-        loadingRelated: false,
-        productList: ((products.products ?? []) as Array<Product>).filter((item) => item.productId !== id),
-      });
+        product.setState({
+          loadingRelated: false,
+          productList: ((products.products ?? []) as Array<Product>).filter((item) => item.productId !== id),
+        });
 
-      router().render();
+        router().render();
+      }
     } catch (error) {
-      console.error("Failed to load related products:", error);
+      router().push("/error");
     }
   };
 
   return {
     state: product.getState(),
     getProductDetail,
-    getRelatedProducts,
     setState: product.setState,
   };
 };

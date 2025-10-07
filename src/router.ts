@@ -1,59 +1,67 @@
 import { productList } from "./pages/list/index.js";
 import { productDetail } from "./pages/detail/index.js";
 import { errorPage } from "./pages/error/index.js";
+import { resetProductListState } from "./state/proudctList.js";
+import { resetProductState } from "./state/proudcDetail.js";
 
 const routes = {
-  "/": productList,
-  "/product/:id": productDetail,
+  "/": { component: productList, reset: resetProductListState },
+  "/product/:id": { component: productDetail, reset: resetProductState },
   "/error": errorPage,
+};
+
+const getRouteParams = (pathnames: string[]) => {
+  let key = "";
+  let params = "";
+
+  for (let pattern in routes) {
+    const patternParts = pattern.split("/").filter((part) => part !== "");
+    const urlParts = pathnames.filter((part) => part !== "");
+
+    if (patternParts.length !== urlParts.length) {
+      continue;
+    }
+
+    let isMatch = true;
+    let extractedParams = "";
+
+    for (let i = 0; i < patternParts.length; i++) {
+      if (patternParts[i].startsWith(":")) {
+        // 동적 파라미터 부분 - URL의 해당 값 저장
+        extractedParams = urlParts[i];
+      } else if (patternParts[i] !== urlParts[i]) {
+        // 고정 부분이 다르면 매칭 실패
+        isMatch = false;
+        break;
+      }
+    }
+
+    // 3단계: 매칭 성공하면 저장
+    if (isMatch) {
+      key = pattern;
+      params = extractedParams;
+      break; // 찾았으니 루프 종료
+    }
+  }
+
+  return {
+    key,
+    params,
+  };
 };
 
 export const router = () => {
   const render = (path?: string) => {
-    console.log("err");
-
-    console.log(path);
-
     const link = path ? path : location.pathname;
     const pathnames = link.split("/");
-    let key = "";
-    let params = "";
     let html = "";
 
     if (routes[link]) {
-      html = routes[link]();
+      html = routes[link]["component"]();
     } else {
-      for (let pattern in routes) {
-        const patternParts = pattern.split("/").filter((part) => part !== "");
-        const urlParts = pathnames.filter((part) => part !== "");
+      const { key, params } = getRouteParams(pathnames);
 
-        if (patternParts.length !== urlParts.length) {
-          continue;
-        }
-
-        let isMatch = true;
-        let extractedParams = "";
-
-        for (let i = 0; i < patternParts.length; i++) {
-          if (patternParts[i].startsWith(":")) {
-            // 동적 파라미터 부분 - URL의 해당 값 저장
-            extractedParams = urlParts[i];
-          } else if (patternParts[i] !== urlParts[i]) {
-            // 고정 부분이 다르면 매칭 실패
-            isMatch = false;
-            break;
-          }
-        }
-
-        // 3단계: 매칭 성공하면 저장
-        if (isMatch) {
-          key = pattern;
-          params = extractedParams;
-          break; // 찾았으니 루프 종료
-        }
-      }
-
-      html = key ? routes[key](params) : routes["/error"]();
+      html = key ? routes[key]["component"](params) : routes["/error"]();
     }
 
     // DOM 업데이트
@@ -68,6 +76,17 @@ export const router = () => {
 
   const push = (path: string) => {
     window.history.pushState(null, "", path);
+    const pathnames = path.split("/");
+
+    if (routes[path]) {
+      routes[path]["reset"]();
+    } else {
+      const { key } = getRouteParams(pathnames);
+      if (key && routes[key]) {
+        routes[key]["reset"]();
+      }
+    }
+
     render(path);
   };
 

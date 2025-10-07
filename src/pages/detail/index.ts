@@ -8,34 +8,16 @@ import { products } from "./products.ts";
 import { router } from "../../router.ts";
 import { createEventDelegation } from "../../utils/eventDelegation.ts";
 
-let hasCheckedStaleData = false;
-
-const loadInitialProductDetail = (
-  state: any,
-  getProductDetail: any,
-  getRelatedProducts: any,
-  id: string,
-  setState: any,
-) => {
-  const shouldLoad = Object.keys(state.product).length === 0 || state.product.productId !== id;
-
-  if (shouldLoad) {
-    // 새 상품 로드
-    getProductDetail(id).then(() => {
-      getRelatedProducts(id);
-    });
-  } else if (!state.loadingRelated && state.productList.length > 0) {
-    // 같은 상품인데 관련 상품이 이미 로드된 상태 = 이전 세션 데이터
-    // 관련 상품만 다시 로드
-    setState({ loadingRelated: true, productList: [] });
-    getRelatedProducts(id);
+const loadInitialProductDetail = (state: any, getProductDetail: any, id: string) => {
+  if (Object.keys(state.product).length === 0 || state.product.productId !== id) {
+    getProductDetail(id);
   }
 };
 
 export const productDetail = (id: string) => {
-  const { state, getProductDetail, getRelatedProducts, setState } = getProductItemDetail();
+  const { state, getProductDetail } = getProductItemDetail();
 
-  loadInitialProductDetail(state, getProductDetail, getRelatedProducts, id, setState);
+  loadInitialProductDetail(state, getProductDetail, id);
 
   createEventDelegation({
     clickByClass: {
