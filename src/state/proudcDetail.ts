@@ -5,6 +5,7 @@ import { Product, ProductItem } from "../type";
 const createInitialState = () => ({
   loading: true,
   loadingRelated: false,
+  quantity: 1,
   product: {} as ProductItem,
   productList: [] as Array<Product>,
 });

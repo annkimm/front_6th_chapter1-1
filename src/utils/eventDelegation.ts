@@ -37,10 +37,14 @@ const initializeGlobalListeners = () => {
 
   document.addEventListener("click", (e: Event) => {
     const target = e.target as HTMLElement;
-    const id = target.id;
 
-    // ID 기반 클릭 처리
-    registeredHandlers.click.get(id)?.(e);
+    // ID 기반 클릭 처리 - 버블링 고려
+    registeredHandlers.click.forEach((handler, id) => {
+      const element = target.closest(`#${id}`) as HTMLElement;
+      if (element) {
+        handler(e);
+      }
+    });
 
     // 클래스 기반 클릭 처리
     registeredHandlers.clickByClass.forEach((handler, className) => {
