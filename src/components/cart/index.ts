@@ -1,8 +1,14 @@
 import { Product } from "../../type";
 import { empty } from "./empty";
 
-export const cart = (productList: Array<{ quantity: number } & Product>) => {
+export const cart = (
+  productList: Array<{ quantity: number } & Product>,
+  checkbox: {
+    [key: string]: string;
+  },
+) => {
   const totalPrice = productList.reduce((sum, { lprice, quantity }) => sum + Number(lprice) * Number(quantity), 0);
+  const selectedItemsLength = Object.keys(checkbox).length;
 
   return (
     /*HTML*/
@@ -102,11 +108,18 @@ export const cart = (productList: Array<{ quantity: number } & Product>) => {
                     </div>
                     <!-- 하단 액션 -->
                     <div class="sticky bottom-0 bg-white border-t border-gray-200 p-4">
-                    <!-- 선택된 아이템 정보 -->
-                    <div class="flex justify-between items-center mb-3 text-sm">
-                        <span class="text-gray-600">선택한 상품 (1개)</span>
-                        <span class="font-medium">440원</span>
-                    </div>
+                    ${
+                      selectedItemsLength > 0
+                        ? `
+                        <!-- 선택된 아이템 정보 -->
+                        <div class="flex justify-between items-center mb-3 text-sm">
+                            <span class="text-gray-600">선택한 상품 (${selectedItemsLength}개)</span>
+                            <span class="font-medium">440원</span>
+                        </div>    
+                    `
+                        : ``
+                    }
+
                     <!-- 총 금액 -->
                     <div class="flex justify-between items-center mb-4">
                         <span class="text-lg font-bold text-gray-900">총 금액</span>

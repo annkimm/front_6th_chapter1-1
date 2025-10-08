@@ -36,6 +36,6 @@ export const layout = (child: string, isDetail?: boolean) => {
             ${header(state.productList.length, isDetail)}
             ${child}
             ${footer()}
-            ${state.isOpen ? cart(state.productList) : ""}
+            ${state.isOpen ? cart(state.productList, state.checkbox) : ""}
         `;
 };

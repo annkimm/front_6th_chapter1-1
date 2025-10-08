@@ -4,6 +4,8 @@ import { Product } from "../type";
 const createInitialState = () => ({
   isOpen: false,
   productList: [] as Array<{ quantity: number } & Product>,
+  checkbox: {} as { [key: string]: string },
+  isAll: false,
 });
 
 const createCart = () => {
