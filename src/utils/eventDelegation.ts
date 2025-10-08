@@ -89,6 +89,13 @@ export const createEventDelegation = (handlers: EventHandlers) => {
     if (handlers.click) {
       Object.entries(handlers.click).forEach(([id, handler]) => {
         registeredHandlers.click.set(id, handler);
+
+        document.querySelectorAll(`#${id}`).forEach((element) => {
+          if (!element.hasAttribute("data-click-attached")) {
+            element.setAttribute("data-click-attached", "true");
+            element.addEventListener("click", (e) => handler(e));
+          }
+        });
       });
     }
 

@@ -6,13 +6,14 @@ import { productItemList, resetProductListState } from "../../state/proudctList.
 import { createEventDelegation } from "../../utils/eventDelegation.js";
 import { router } from "../../router.js";
 import { layout } from "../../components/layout.js";
-import { cartModal } from "../../state/cart.js";
+import { cartModal, resetCartState } from "../../state/cart.js";
 
 // 상태 초기화 로직
 const ensureCleanState = () => {
   const root = document.getElementById("root");
   if (root?.innerHTML === "") {
     resetProductListState();
+    resetCartState();
   }
 };
 

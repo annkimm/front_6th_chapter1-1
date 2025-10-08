@@ -12,7 +12,7 @@ export const cart = (
 
   return (
     /*HTML*/
-    `<div id="cart" class="flex min-h-full items-end justify-center p-0 sm:items-center sm:p-4 fixed left-0 top-0 w-full h-full">
+    `<div id="cart" class="cart-modal cart-modal-overlay flex min-h-full items-end justify-center p-0 sm:items-center sm:p-4 fixed left-0 top-0 w-full h-full">
       <div class="relative bg-white rounded-t-lg sm:rounded-lg shadow-xl w-full max-w-md sm:max-w-lg max-h-[90vh] overflow-hidden">
         <!-- 헤더 -->
         <div class="sticky top-0 bg-white border-b border-gray-200 p-4 flex items-center justify-between">
