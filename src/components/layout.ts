@@ -1,4 +1,3 @@
-import { router } from "../router";
 import { cartModal } from "../state/cart";
 import { createEventDelegation } from "../utils/eventDelegation";
 import { cart } from "./cart";
@@ -12,22 +11,14 @@ export const layout = (child: string, isDetail?: boolean) => {
     globalKeydown: (e: KeyboardEvent) => {
       if (e.key === "Escape") {
         openCartModal();
-        router().render();
       }
     },
     click: {
-      "cart-icon-btn": () => {
-        openCartModal();
-        router().render();
-      },
-      "cart-modal-close-btn": () => {
-        openCartModal();
-        router().render();
-      },
+      "cart-icon-btn": openCartModal,
+      "cart-modal-close-btn": openCartModal,
       cart: (e: Event) => {
         if ((e.target as HTMLElement).id === "cart") {
           openCartModal();
-          router().render();
         }
       },
     },

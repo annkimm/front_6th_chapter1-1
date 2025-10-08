@@ -1,3 +1,5 @@
+import { router } from "../router";
+
 const createInitialState = () => ({
   isOpen: false,
   productList: [],
@@ -25,6 +27,7 @@ export const cartModal = () => {
   const openCartModal = () => {
     const state = cart.getState();
     cart.setState({ isOpen: !state.isOpen });
+    router().render();
   };
 
   return {
