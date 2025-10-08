@@ -25,7 +25,7 @@ export const layout = (child: string, isDetail?: boolean) => {
   })();
 
   return `
-            ${header(isDetail)}
+            ${header(state.productList.length, isDetail)}
             ${child}
             ${footer()}
             ${state.isOpen ? cart(state.productList) : ""}
