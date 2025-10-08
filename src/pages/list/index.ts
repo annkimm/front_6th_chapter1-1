@@ -1,5 +1,3 @@
-import { header } from "../../components/header.js";
-import { footer } from "../../components/footer.js";
 import { card } from "./card.js";
 import { searchBar } from "./searchBar.js";
 import { skeleton } from "../../components/skeleton.js";
@@ -7,6 +5,7 @@ import { loading } from "./loading.js";
 import { productItemList, resetProductListState } from "../../state/proudctList.js";
 import { createEventDelegation } from "../../utils/eventDelegation.js";
 import { router } from "../../router.js";
+import { layout } from "../../components/layout.js";
 
 // 상태 초기화 로직
 const ensureCleanState = () => {
@@ -109,34 +108,34 @@ export const productList = () => {
   })();
 
   return /*HTML*/ `
-    ${header()}
-    <main class="max-w-md mx-auto px-4 py-4">
-      ${searchBar(state.loading, state.filters, state.pagination.limit, state.categories)}
-      <!-- 상품 목록 -->
-      <div class="mb-6">
-        <div>
-          <!-- 상품 개수 정보 (loading 중일 때는 안보임) -->
-          ${
-            state.loading
-              ? ""
-              : `<div class="mb-4 text-sm text-gray-600">
-            총 <span class="font-medium text-gray-900">${state.pagination.total}개</span>의 상품
-          </div>`
-          }
-          <!-- 상품 그리드 -->
-          <div class="grid grid-cols-2 gap-4 mb-6" id="products-grid">
-            ${state.loading ? skeleton() : state.products.map((product: any) => card(product)).join("")}
+    ${layout(
+      `<main class="max-w-md mx-auto px-4 py-4">
+        ${searchBar(state.loading, state.filters, state.pagination.limit, state.categories)}
+        <!-- 상품 목록 -->
+        <div class="mb-6">
+          <div>
+            <!-- 상품 개수 정보 (loading 중일 때는 안보임) -->
+            ${
+              state.loading
+                ? ""
+                : `<div class="mb-4 text-sm text-gray-600">
+              총 <span class="font-medium text-gray-900">${state.pagination.total}개</span>의 상품
+            </div>`
+            }
+            <!-- 상품 그리드 -->
+            <div class="grid grid-cols-2 gap-4 mb-6" id="products-grid">
+              ${state.loading ? skeleton() : state.products.map((product: any) => card(product)).join("")}
+            </div>
+            ${
+              state.loading
+                ? loading()
+                : `<div class="text-center py-4 text-sm text-gray-500">
+              모든 상품을 확인했습니다
+            </div>`
+            }
           </div>
-          ${
-            state.loading
-              ? loading()
-              : `<div class="text-center py-4 text-sm text-gray-500">
-            모든 상품을 확인했습니다
-          </div>`
-          }
         </div>
-      </div>
-    </main>
-    ${footer()}
+      </main>`,
+    )}
   `;
 };
