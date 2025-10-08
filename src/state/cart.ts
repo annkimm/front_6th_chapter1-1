@@ -50,7 +50,16 @@ export const cartModal = () => {
   const deleteCartItem = (productId: string) => {
     const state = cart.getState();
     const productList = state.productList.filter((item) => item.productId !== productId);
-    cart.setState({ productList });
+    const entries = Object.entries(state.checkbox).filter(([key]) => key !== productId);
+    const checkbox = Object.fromEntries(entries);
+
+    cart.setState({ productList, checkbox });
+
+    router().render();
+  };
+
+  const deleteAllCartItem = () => {
+    cart.setState({ productList: [], checkbox: {} });
 
     router().render();
   };
@@ -60,5 +69,6 @@ export const cartModal = () => {
     openCartModal,
     addCartItem,
     deleteCartItem,
+    deleteAllCartItem,
   };
 };
