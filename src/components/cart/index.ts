@@ -1,6 +1,6 @@
 import { empty } from "./empty";
 
-export const cart = () => {
+export const cart = (productList: Array<any>) => {
   const isEmpty = false;
   return (
     /*HTML*/
@@ -23,7 +23,7 @@ export const cart = () => {
         </div>
         
         ${
-          isEmpty
+          productList.length === 0
             ? empty()
             : `
                 <div class="relative bg-white rounded-t-lg sm:rounded-lg shadow-xl w-full max-w-md sm:max-w-lg max-h-[90vh] overflow-hidden">

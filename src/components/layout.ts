@@ -28,6 +28,6 @@ export const layout = (child: string, isDetail?: boolean) => {
             ${header(isDetail)}
             ${child}
             ${footer()}
-            ${state.isOpen ? cart() : ""}
+            ${state.isOpen ? cart(state.productList) : ""}
         `;
 };
