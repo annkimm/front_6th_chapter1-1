@@ -28,7 +28,7 @@ const product = createProductDetail();
 
 export const resetProductState = product.reset;
 
-export const getProductItemDetail = () => {
+export const productItemDetail = () => {
   const getProductDetail = async (id: string) => {
     try {
       product.setState({ loading: true, loadingRelated: true, productList: [] });

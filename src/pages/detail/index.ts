@@ -2,7 +2,7 @@ import { footer } from "../../components/footer.ts";
 import { header } from "../../components/header.ts";
 import { loading } from "./loading.ts";
 import { detail } from "./detail.ts";
-import { getProductItemDetail } from "../../state/proudcDetail.ts";
+import { productItemDetail } from "../../state/proudcDetail.ts";
 import { breadcrumb } from "./breadcrumb.ts";
 import { products } from "./products.ts";
 import { router } from "../../router.ts";
@@ -15,7 +15,7 @@ const loadInitialProductDetail = (state: any, getProductDetail: any, id: string)
 };
 
 export const productDetail = (id: string) => {
-  const { state, getProductDetail, setState } = getProductItemDetail();
+  const { state, getProductDetail, setState } = productItemDetail();
 
   loadInitialProductDetail(state, getProductDetail, id);
 

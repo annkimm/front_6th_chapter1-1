@@ -29,7 +29,7 @@ const manager = createProductListManager();
 
 export const resetProductListState = manager.reset;
 
-export const getProductList = () => {
+export const productItemList = () => {
   const getProudcts = async (params: {
     limit: number;
     search: string;

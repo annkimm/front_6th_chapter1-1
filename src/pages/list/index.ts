@@ -4,7 +4,7 @@ import { card } from "./card.js";
 import { searchBar } from "./searchBar.js";
 import { skeleton } from "../../components/skeleton.js";
 import { loading } from "./loading.js";
-import { getProductList, resetProductListState } from "../../state/proudctList.js";
+import { productItemList, resetProductListState } from "../../state/proudctList.js";
 import { createEventDelegation } from "../../utils/eventDelegation.js";
 import { router } from "../../router.js";
 
@@ -30,7 +30,7 @@ const loadInitialProducts = (state: any, getProudcts: any) => {
 };
 
 export const productList = () => {
-  const { state, getProudcts } = getProductList();
+  const { state, getProudcts } = productItemList();
 
   ensureCleanState();
   loadInitialProducts(state, getProudcts);
