@@ -4,6 +4,7 @@ type EventHandlers = {
   click?: Record<string, (e: Event) => void>;
   clickByClass?: Record<string, (e: Event, element: HTMLElement) => void>;
   keydown?: Record<string, (e: KeyboardEvent) => void>;
+  globalKeydown?: (e: KeyboardEvent) => void;
 };
 
 const registeredHandlers: {
@@ -12,12 +13,14 @@ const registeredHandlers: {
   click: Map<string, (e: Event) => void>;
   clickByClass: Map<string, (e: Event, element: HTMLElement) => void>;
   keydown: Map<string, (e: KeyboardEvent) => void>;
+  globalKeydown: ((e: KeyboardEvent) => void) | null;
 } = {
   input: new Map(),
   change: new Map(),
   click: new Map(),
   clickByClass: new Map(),
   keydown: new Map(),
+  globalKeydown: null,
 };
 
 let globalInitialized = false;
@@ -56,6 +59,10 @@ const initializeGlobalListeners = () => {
   });
 
   document.addEventListener("keydown", (e: KeyboardEvent) => {
+    // 전역 키 이벤트 먼저 처리
+    registeredHandlers.globalKeydown?.(e);
+
+    // ID 기반 키 이벤트 처리
     const id = (e.target as HTMLElement).id;
     registeredHandlers.keydown.get(id)?.(e);
   });
@@ -103,6 +110,10 @@ export const createEventDelegation = (handlers: EventHandlers) => {
       Object.entries(handlers.keydown).forEach(([id, handler]) => {
         registeredHandlers.keydown.set(id, handler);
       });
+    }
+
+    if (handlers.globalKeydown) {
+      registeredHandlers.globalKeydown = handlers.globalKeydown;
     }
   };
 };
