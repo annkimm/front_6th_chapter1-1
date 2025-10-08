@@ -5,7 +5,7 @@ import { footer } from "./footer";
 import { header } from "./header";
 
 export const layout = (child: string, isDetail?: boolean) => {
-  const { state, openCartModal } = cartModal();
+  const { state, openCartModal, deleteCartItem } = cartModal();
 
   createEventDelegation({
     globalKeydown: (e: KeyboardEvent) => {
@@ -19,6 +19,14 @@ export const layout = (child: string, isDetail?: boolean) => {
       cart: (e: Event) => {
         if ((e.target as HTMLElement).id === "cart") {
           openCartModal();
+        }
+      },
+    },
+    clickByClass: {
+      "cart-item-remove-btn": (_e: Event, element: HTMLElement) => {
+        const productId = element?.dataset.productId;
+        if (productId) {
+          deleteCartItem(productId);
         }
       },
     },

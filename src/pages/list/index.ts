@@ -6,6 +6,7 @@ import { productItemList, resetProductListState } from "../../state/proudctList.
 import { createEventDelegation } from "../../utils/eventDelegation.js";
 import { router } from "../../router.js";
 import { layout } from "../../components/layout.js";
+import { cartModal } from "../../state/cart.js";
 
 // 상태 초기화 로직
 const ensureCleanState = () => {
@@ -30,6 +31,7 @@ const loadInitialProducts = (state: any, getProudcts: any) => {
 
 export const productList = () => {
   const { state, getProudcts } = productItemList();
+  const { addCartItem } = cartModal();
 
   ensureCleanState();
   loadInitialProducts(state, getProudcts);
@@ -102,6 +104,14 @@ export const productList = () => {
             category2: category2,
             sort: state.filters.sort,
           });
+        }
+      },
+      "add-to-cart-btn": (_e: Event, element: HTMLElement) => {
+        const productId = element?.dataset.productId;
+        const product = state.products.find((item) => item.productId === productId);
+
+        if (product) {
+          addCartItem(product);
         }
       },
     },
