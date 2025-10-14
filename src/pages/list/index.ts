@@ -7,6 +7,7 @@ import { createEventDelegation } from "../../utils/eventDelegation.js";
 import { router } from "../../router.js";
 import { layout } from "../../components/layout.js";
 import { cartModal, resetCartState } from "../../state/cart.js";
+import { toastMessage } from "../../state/toast.js";
 
 // 상태 초기화 로직
 const ensureCleanState = () => {
@@ -33,6 +34,7 @@ const loadInitialProducts = (state: any, getProudcts: any) => {
 export const productList = () => {
   const { state, getProudcts } = productItemList();
   const { addCartItem } = cartModal();
+  const { openToast } = toastMessage();
 
   ensureCleanState();
   loadInitialProducts(state, getProudcts);
@@ -113,6 +115,7 @@ export const productList = () => {
 
         if (product) {
           addCartItem(product);
+          openToast("장바구니에 추가되었습니다", "green");
         }
       },
     },

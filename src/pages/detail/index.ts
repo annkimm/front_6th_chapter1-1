@@ -6,6 +6,8 @@ import { products } from "./products.ts";
 import { router } from "../../router.ts";
 import { createEventDelegation } from "../../utils/eventDelegation.ts";
 import { layout } from "../../components/layout.ts";
+import { cartModal } from "../../state/cart.ts";
+import { toastMessage } from "../../state/toast.ts";
 
 const loadInitialProductDetail = (state: any, getProductDetail: any, id: string) => {
   if (Object.keys(state.product).length === 0 || state.product.productId !== id) {
@@ -15,6 +17,8 @@ const loadInitialProductDetail = (state: any, getProductDetail: any, id: string)
 
 export const productDetail = (id: string) => {
   const { state, getProductDetail, setState } = productItemDetail();
+  const { addCartItem } = cartModal();
+  const { openToast } = toastMessage();
 
   loadInitialProductDetail(state, getProductDetail, id);
 
@@ -36,6 +40,10 @@ export const productDetail = (id: string) => {
         const decreaseQuantity = state.quantity - 1;
         setState({ quantity: decreaseQuantity === 0 ? 1 : decreaseQuantity });
         router().render();
+      },
+      "add-to-cart-btn": (e: Event) => {
+        addCartItem(state.product);
+        openToast("장바구니에 추가되었습니다", "green");
       },
     },
   })();
