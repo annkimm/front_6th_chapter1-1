@@ -9,13 +9,16 @@ export const cart = () => {
     deleteAllCartItem,
     increaseQuantity,
     decreaseQuantity,
+    setCheckBox,
+    deletePartCart,
   } = cartModal();
   const totalPrice = productList.reduce((sum, { lprice, quantity }) => sum + Number(lprice) * Number(quantity), 0);
-  const selectedItemsLength = Object.keys(checkbox).length;
+  const selectedItemsLength = Object.values(checkbox).filter((item) => item === true).length;
 
   createEventDelegation({
     click: {
       "cart-modal-clear-cart-btn": deleteAllCartItem,
+      "cart-modal-remove-selected-btn": deletePartCart,
     },
     clickByClass: {
       "cart-item-remove-btn": (_e: Event, element: HTMLElement) => {
@@ -34,6 +37,12 @@ export const cart = () => {
         const productId = element?.dataset.productId;
         if (productId) {
           increaseQuantity(productId);
+        }
+      },
+      "cart-item-checkbox": (_e: Event, element: HTMLElement) => {
+        const productId = element?.dataset.productId;
+        if (productId) {
+          setCheckBox(productId);
         }
       },
     },
@@ -156,10 +165,16 @@ export const cart = () => {
                     </div>
                     <!-- 액션 버튼들 -->
                     <div class="space-y-2">
-                        <button id="cart-modal-remove-selected-btn" class="w-full bg-red-600 text-white py-2 px-4 rounded-md 
-                                hover:bg-red-700 transition-colors text-sm">
-                        선택한 상품 삭제 (1개)
-                        </button>
+                        ${
+                          selectedItemsLength > 0
+                            ? `
+                          <button id="cart-modal-remove-selected-btn" class="w-full bg-red-600 text-white py-2 px-4 rounded-md 
+                                hover:bg-red-700 transition-colors text-sm">선택한 상품 삭제 (${selectedItemsLength}개)
+                          </button>
+                          `
+                            : ``
+                        }
+
                         <div class="flex gap-2">
                         <button id="cart-modal-clear-cart-btn" class="flex-1 bg-gray-600 text-white py-2 px-4 rounded-md 
                                 hover:bg-gray-700 transition-colors text-sm">

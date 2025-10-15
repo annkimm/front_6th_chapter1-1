@@ -4,7 +4,7 @@ import { Product } from "../type";
 const createInitialState = () => ({
   isOpen: false,
   productList: [] as Array<{ quantity: number } & Product>,
-  checkbox: {} as { [key: string]: string },
+  checkbox: {} as { [key: string]: boolean },
   isAll: false,
 });
 
@@ -71,7 +71,6 @@ export const cartModal = () => {
     );
 
     cart.setState({ productList });
-
     router().render();
   };
 
@@ -80,6 +79,25 @@ export const cartModal = () => {
     const productList = state.productList.map((item) =>
       item.productId === productId ? { ...item, quantity: item.quantity + 1 } : item,
     );
+
+    cart.setState({ productList });
+    router().render();
+  };
+
+  const setCheckBox = (productId: string) => {
+    const state = cart.getState();
+    const checkbox = state.checkbox[productId]
+      ? { ...state.checkbox, [productId]: !state.checkbox[productId] }
+      : { ...state.checkbox, [productId]: true };
+
+    cart.setState({ checkbox });
+
+    router().render();
+  };
+
+  const deletePartCart = () => {
+    const state = cart.getState();
+    const productList = state.productList.filter((item) => !state.checkbox[item.productId]);
 
     cart.setState({ productList });
 
@@ -94,5 +112,7 @@ export const cartModal = () => {
     deleteAllCartItem,
     decreaseQuantity,
     increaseQuantity,
+    setCheckBox,
+    deletePartCart,
   };
 };
