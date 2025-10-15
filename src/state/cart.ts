@@ -64,11 +64,35 @@ export const cartModal = () => {
     router().render();
   };
 
+  const decreaseQuantity = (productId: string) => {
+    const state = cart.getState();
+    const productList = state.productList.map((item) =>
+      item.productId === productId ? { ...item, quantity: item.quantity - 1 === 0 ? 1 : item.quantity - 1 } : item,
+    );
+
+    cart.setState({ productList });
+
+    router().render();
+  };
+
+  const increaseQuantity = (productId: string) => {
+    const state = cart.getState();
+    const productList = state.productList.map((item) =>
+      item.productId === productId ? { ...item, quantity: item.quantity + 1 } : item,
+    );
+
+    cart.setState({ productList });
+
+    router().render();
+  };
+
   return {
     state: cart.getState(),
     openCartModal,
     addCartItem,
     deleteCartItem,
     deleteAllCartItem,
+    decreaseQuantity,
+    increaseQuantity,
   };
 };

@@ -7,7 +7,10 @@ import { header } from "./header";
 import { toast } from "./toast/toast";
 
 export const layout = (child: string, isDetail?: boolean) => {
-  const { state, openCartModal, deleteCartItem, deleteAllCartItem } = cartModal();
+  const {
+    state: { isOpen, productList },
+    openCartModal,
+  } = cartModal();
   const { state: toastState } = toastMessage();
 
   createEventDelegation({
@@ -24,23 +27,14 @@ export const layout = (child: string, isDetail?: boolean) => {
           openCartModal();
         }
       },
-      "cart-modal-clear-cart-btn": deleteAllCartItem,
-    },
-    clickByClass: {
-      "cart-item-remove-btn": (_e: Event, element: HTMLElement) => {
-        const productId = element?.dataset.productId;
-        if (productId) {
-          deleteCartItem(productId);
-        }
-      },
     },
   })();
 
   return `
-            ${header(state.productList.length, isDetail)}
+            ${header(productList.length, isDetail)}
             ${child}
             ${footer()}
-            ${state.isOpen ? cart(state.productList, state.checkbox) : ""}
+            ${isOpen ? cart() : ""}
             ${toastState.isOpen ? toast(toastState.color, toastState.message) : ""}
         `;
 };

@@ -1,14 +1,43 @@
-import { Product } from "../../type";
+import { cartModal } from "../../state/cart";
+import { createEventDelegation } from "../../utils/eventDelegation";
 import { empty } from "./empty";
 
-export const cart = (
-  productList: Array<{ quantity: number } & Product>,
-  checkbox: {
-    [key: string]: string;
-  },
-) => {
+export const cart = () => {
+  const {
+    state: { productList, checkbox },
+    deleteCartItem,
+    deleteAllCartItem,
+    increaseQuantity,
+    decreaseQuantity,
+  } = cartModal();
   const totalPrice = productList.reduce((sum, { lprice, quantity }) => sum + Number(lprice) * Number(quantity), 0);
   const selectedItemsLength = Object.keys(checkbox).length;
+
+  createEventDelegation({
+    click: {
+      "cart-modal-clear-cart-btn": deleteAllCartItem,
+    },
+    clickByClass: {
+      "cart-item-remove-btn": (_e: Event, element: HTMLElement) => {
+        const productId = element?.dataset.productId;
+        if (productId) {
+          deleteCartItem(productId);
+        }
+      },
+      "quantity-decrease-btn": (_e: Event, element: HTMLElement) => {
+        const productId = element?.dataset.productId;
+        if (productId) {
+          decreaseQuantity(productId);
+        }
+      },
+      "quantity-increase-btn": (_e: Event, element: HTMLElement) => {
+        const productId = element?.dataset.productId;
+        if (productId) {
+          increaseQuantity(productId);
+        }
+      },
+    },
+  })();
 
   return (
     /*HTML*/
@@ -58,7 +87,7 @@ export const cart = (
                             }) => `<div class="flex items-center py-3 border-b border-gray-100 cart-item" data-product-id="${productId}">
                             <!-- 선택 체크박스 -->
                             <label class="flex items-center mr-3">
-                            <input type="checkbox" checked="" class="cart-item-checkbox w-4 h-4 text-blue-600 border-gray-300 rounded 
+                            <input type="checkbox" ${checkbox?.[productId] ? `checked=""` : ``} class="cart-item-checkbox w-4 h-4 text-blue-600 border-gray-300 rounded 
                             focus:ring-blue-500" data-product-id="${productId}">
                             </label>
                             <!-- 상품 이미지 -->
