@@ -29,7 +29,7 @@ export const resetCartState = cart.reset;
 export const cartModal = () => {
   const openCartModal = () => {
     const state = cart.getState();
-    cart.setState({ isOpen: !state.isOpen });
+    cart.setState({ isOpen: !state.isOpen, checkbox: {}, isAll: false });
     router().render();
   };
 
