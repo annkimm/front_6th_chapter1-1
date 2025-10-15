@@ -4,12 +4,13 @@ import { empty } from "./empty";
 
 export const cart = () => {
   const {
-    state: { productList, checkbox },
+    state: { productList, checkbox, isAll },
     deleteCartItem,
     deleteAllCartItem,
     increaseQuantity,
     decreaseQuantity,
     setCheckBox,
+    setAllCheckbox,
     deletePartCart,
   } = cartModal();
   const totalPrice = productList.reduce((sum, { lprice, quantity }) => sum + Number(lprice) * Number(quantity), 0);
@@ -19,6 +20,7 @@ export const cart = () => {
     click: {
       "cart-modal-clear-cart-btn": deleteAllCartItem,
       "cart-modal-remove-selected-btn": deletePartCart,
+      "cart-modal-select-all-checkbox": setAllCheckbox,
     },
     clickByClass: {
       "cart-item-remove-btn": (_e: Event, element: HTMLElement) => {
@@ -78,7 +80,9 @@ export const cart = () => {
                     <!-- 전체 선택 섹션 -->
                     <div class="p-4 border-b border-gray-200 bg-gray-50">
                         <label class="flex items-center text-sm text-gray-700">
-                        <input type="checkbox" id="cart-modal-select-all-checkbox" class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 mr-2">
+                        <input type="checkbox"
+                        ${isAll ? `checked='true'` : ""}
+                        id="cart-modal-select-all-checkbox" class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 mr-2">
                         전체선택 (${productList.length}개)
                         </label>
                     </div>

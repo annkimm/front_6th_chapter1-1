@@ -104,6 +104,20 @@ export const cartModal = () => {
     router().render();
   };
 
+  const setAllCheckbox = () => {
+    const state = cart.getState();
+    const isAll = !state.isAll;
+
+    const checkbox = state.productList.reduce((acc, cur) => {
+      acc[cur.productId] = isAll; // key는 id, 값은 전체 객체
+      return acc;
+    }, {});
+
+    cart.setState({ checkbox, isAll });
+
+    router().render();
+  };
+
   return {
     state: cart.getState(),
     openCartModal,
@@ -114,5 +128,6 @@ export const cartModal = () => {
     increaseQuantity,
     setCheckBox,
     deletePartCart,
+    setAllCheckbox,
   };
 };
