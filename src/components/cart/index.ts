@@ -14,6 +14,10 @@ export const cart = () => {
     deletePartCart,
   } = cartModal();
   const totalPrice = productList.reduce((sum, { lprice, quantity }) => sum + Number(lprice) * Number(quantity), 0);
+  const selectedTotalPrice = productList.reduce(
+    (sum, { lprice, quantity, productId }) => sum + (checkbox[productId] ? Number(lprice) * Number(quantity) : 0),
+    0,
+  );
   const selectedItemsLength = Object.values(checkbox).filter((item) => item === true).length;
 
   createEventDelegation({
@@ -156,7 +160,7 @@ export const cart = () => {
                         <!-- 선택된 아이템 정보 -->
                         <div class="flex justify-between items-center mb-3 text-sm">
                             <span class="text-gray-600">선택한 상품 (${selectedItemsLength}개)</span>
-                            <span class="font-medium">440원</span>
+                            <span class="font-medium">${selectedTotalPrice}원</span>
                         </div>    
                     `
                         : ``
