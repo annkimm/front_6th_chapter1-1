@@ -77,10 +77,16 @@ describe("2. 상품 상세 - 장바구니 담기", () => {
   });
 
   test("페이지 내에서 수량을 입력 혹은 선택하여 장바구니에 추가할 수 있다", async () => {
+    console.log("1");
+
     await 상품_상세페이지_접속();
+
+    console.log("2");
 
     document.querySelector("#quantity-increase").click();
     expect(document.querySelector("#quantity-input").value).toBe("2");
+
+    console.log("3");
 
     document.querySelector("#quantity-decrease").click();
     expect(document.querySelector("#quantity-input").value).toBe("1");

@@ -1,6 +1,7 @@
-import { findByText, getByText, queryByText, screen } from "@testing-library/dom";
+import { findByText, getByText, queryByText, screen, waitFor } from "@testing-library/dom";
 import { userEvent } from "@testing-library/user-event";
 import { afterEach, beforeAll, beforeEach, describe, expect, test } from "vitest";
+import { server } from "./mockServerHandler.js";
 
 const goTo = (path) => {
   window.history.pushState({}, "", path);
@@ -9,11 +10,17 @@ const goTo = (path) => {
 
 // 장바구니에 상품을 추가하는 헬퍼 함수
 const addProductToCart = async (productName) => {
+  console.log(1111);
+
   const productElement = await findByText(document.querySelector("#products-grid"), new RegExp(productName, "i"));
   const cartButton = productElement.closest(".product-card").querySelector(".add-to-cart-btn");
   await userEvent.click(cartButton);
 
+  console.log(222);
+
   expect(screen.getByText("장바구니에 추가되었습니다")).toBeInTheDocument();
+
+  console.log(333);
 };
 
 beforeAll(async () => {
@@ -21,12 +28,15 @@ beforeAll(async () => {
   await import("../main.js");
 });
 
-beforeEach(() => goTo("/"));
+beforeEach(() => {
+  goTo("/");
+});
 
 afterEach(() => {
   // 각 테스트 후 상태 초기화
   document.getElementById("root").innerHTML = "";
   localStorage.clear();
+  server.resetHandlers();
 });
 
 describe("1. 장바구니 모달", () => {
@@ -116,7 +126,9 @@ describe.sequential("2. 장바구니 수량 조절", () => {
     await userEvent.click(increaseButton);
 
     // 수량이 증가했는지 확인
-    expect(quantityInput.value).toBe("2");
+    await waitFor(() => {
+      expect(document.querySelector(".quantity-input").value).toBe("2");
+    });
   });
 
   test("각 장바구니 상품의 수량을 감소할 수 있다", async () => {
@@ -143,7 +155,9 @@ describe.sequential("2. 장바구니 수량 조절", () => {
     await userEvent.click(decreaseButton);
 
     // 테스트 진행에 따른다면 toBe("1")일 것으로 예상
-    expect(quantityInput.value).toBe("1");
+    await waitFor(() => {
+      expect(document.querySelector(".quantity-input").value).toBe("1");
+    });
   });
 
   test("수량 변경 시 총 금액이 실시간으로 업데이트된다", async () => {
@@ -214,16 +228,24 @@ describe.sequential("4. 장바구니 선택 삭제", () => {
     await screen.findByText(/총 의 상품/i);
     screen.getByText("340개");
 
+    console.log("1");
+
     // 두 개의 상품을 장바구니에 추가
     await addProductToCart("pvc 투명 젤리 쇼핑백");
     await addProductToCart("샷시 풍지판");
 
+    console.log("2");
+
     const cartIcon = document.querySelector("#cart-icon-btn");
     await userEvent.click(cartIcon);
+
+    console.log("3");
 
     // 첫 번째 상품만 선택
     const checkboxes = document.querySelectorAll(".cart-item-checkbox");
     expect(checkboxes.length).toBe(2);
+
+    console.log("4");
 
     await userEvent.click(checkboxes[0]);
 
@@ -231,11 +253,14 @@ describe.sequential("4. 장바구니 선택 삭제", () => {
     const selectedDeleteButton = document.querySelector("#cart-modal-remove-selected-btn");
     await userEvent.click(selectedDeleteButton);
 
+    console.log("5");
+
     // 선택된 상품만 삭제되고 나머지는 남아있는지 확인
     await screen.findByText("전체선택 (1개)");
     const cartModal = document.querySelector(".cart-modal");
     expect(queryByText(cartModal, /pvc 투명 젤리 쇼핑백/i)).not.toBeInTheDocument();
     expect(getByText(cartModal, /샷시 풍지판/i)).toBeInTheDocument();
+    console.log("6");
   });
 });
 
@@ -261,6 +286,8 @@ describe.sequential("5. 장바구니 전체 선택", () => {
     // 두 개의 상품을 장바구니에 추가
     await addProductToCart("pvc 투명 젤리 쇼핑백");
     await addProductToCart("고양이 난간 안전망");
+
+    console.log(2);
 
     const cartIcon = document.querySelector("#cart-icon-btn");
     await userEvent.click(cartIcon);
