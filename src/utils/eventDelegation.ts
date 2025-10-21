@@ -3,6 +3,7 @@ type EventHandlers = {
   change?: Record<string, (e: Event) => void>;
   click?: Record<string, (e: Event) => void>;
   clickByClass?: Record<string, (e: Event, element: HTMLElement) => void>;
+  clickByData?: Record<string, (e: Event, element: HTMLElement) => void>;
   keydown?: Record<string, (e: KeyboardEvent) => void>;
   globalKeydown?: (e: KeyboardEvent) => void;
 };
@@ -12,6 +13,7 @@ const registeredHandlers: {
   change: Map<string, (e: Event) => void>;
   click: Map<string, (e: Event) => void>;
   clickByClass: Map<string, (e: Event, element: HTMLElement) => void>;
+  clickByData: Map<string, (e: Event, element: HTMLElement) => void>;
   keydown: Map<string, (e: KeyboardEvent) => void>;
   globalKeydown: ((e: KeyboardEvent) => void) | null;
 } = {
@@ -19,6 +21,7 @@ const registeredHandlers: {
   change: new Map(),
   click: new Map(),
   clickByClass: new Map(),
+  clickByData: new Map(),
   keydown: new Map(),
   globalKeydown: null,
 };
@@ -52,6 +55,14 @@ const initializeGlobalListeners = () => {
     // 클래스 기반 클릭 처리
     registeredHandlers.clickByClass.forEach((handler, className) => {
       const element = target.closest(`.${className}`) as HTMLElement;
+      if (element) {
+        handler(e, element);
+      }
+    });
+
+    // data 속성 기반 클릭 처리
+    registeredHandlers.clickByData.forEach((handler, dataAttr) => {
+      const element = target.closest(`[${dataAttr}]`) as HTMLElement;
       if (element) {
         handler(e, element);
       }
@@ -105,6 +116,20 @@ export const createEventDelegation = (handlers: EventHandlers) => {
 
         // 테스트 환경 userEvent.click 지원
         document.querySelectorAll(`.${className}`).forEach((element) => {
+          if (!element.hasAttribute("data-click-attached")) {
+            element.setAttribute("data-click-attached", "true");
+            element.addEventListener("click", (e) => handler(e, element as HTMLElement));
+          }
+        });
+      });
+    }
+
+    if (handlers.clickByData) {
+      Object.entries(handlers.clickByData).forEach(([dataAttr, handler]) => {
+        registeredHandlers.clickByData.set(dataAttr, handler);
+
+        // 테스트 환경 userEvent.click 지원
+        document.querySelectorAll(`[${dataAttr}]`).forEach((element) => {
           if (!element.hasAttribute("data-click-attached")) {
             element.setAttribute("data-click-attached", "true");
             element.addEventListener("click", (e) => handler(e, element as HTMLElement));

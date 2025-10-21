@@ -6,6 +6,7 @@ import { resetProductState } from "./state/proudcDetail.js";
 
 const routes = {
   "/": { component: productList, reset: resetProductListState },
+  "": { component: productList, reset: resetProductListState },
   "/product/:id": { component: productDetail, reset: resetProductState },
   "/error": errorPage,
 };
@@ -50,14 +51,19 @@ const getRouteParams = (pathnames: string[]) => {
   };
 };
 
+const checkParameter = (link: string) => {
+  return link.split("?");
+};
+
 export const router = () => {
   const render = (path?: string) => {
     const link = path ? path : location.pathname;
+    const originLink = checkParameter(link)[0];
     const pathnames = link.split("/");
     let html = "";
 
-    if (routes[link]) {
-      html = routes[link]["component"]();
+    if (routes[originLink]) {
+      html = routes[originLink]["component"]();
     } else {
       const { key, params } = getRouteParams(pathnames);
 
@@ -77,6 +83,8 @@ export const router = () => {
   const push = (path: string) => {
     window.history.pushState(null, "", path);
     const pathnames = path.split("/");
+
+    console.log(pathnames);
 
     if (routes[path]) {
       routes[path]["reset"]();

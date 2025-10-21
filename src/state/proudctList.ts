@@ -1,6 +1,7 @@
 import { getCategories, getProducts } from "../api/productApi";
 import { router } from "../router";
 import { Filters, Pagination, Product } from "../type";
+import { getParams } from "../utils/fetch";
 
 const createInitialState = () => ({
   loading: true,
@@ -51,7 +52,10 @@ export const productItemList = () => {
         categories: categories,
       });
 
+      const searchParams = getParams(params);
+
       // 여기서 리렌더링!
+      history.pushState(null, "", `${window.location.pathname}?${searchParams}`);
       router().render();
     } catch (error) {
       router().render("/error");

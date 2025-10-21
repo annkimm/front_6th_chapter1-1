@@ -8,6 +8,7 @@ import { createEventDelegation } from "../../utils/eventDelegation.ts";
 import { layout } from "../../components/layout.ts";
 import { cartModal } from "../../state/cart.ts";
 import { toastMessage } from "../../state/toast.ts";
+import { getParams } from "../../utils/fetch.ts";
 
 const loadInitialProductDetail = (state: any, getProductDetail: any, id: string) => {
   if (Object.keys(state.product).length === 0 || state.product.productId !== id) {
@@ -28,6 +29,30 @@ export const productDetail = (id: string) => {
         const productId = element.getAttribute("data-product-id");
         if (productId) {
           router().push(`/product/${productId}`);
+        }
+      },
+      "breadcrumb-link": (_e: Event, element: HTMLElement) => {
+        const currentValue = Object.values(element.dataset);
+        const children = element.parentElement?.children;
+        const params = {};
+
+        if (children) {
+          const buttons = Array.from(children)
+            .filter(({ tagName }) => tagName === "BUTTON")
+            .map((item) => (item as HTMLElement)?.dataset);
+
+          for (const btn of buttons) {
+            const [[key, value]] = Object.entries(btn);
+            params[key] = value;
+
+            if (currentValue[0] === value) {
+              break;
+            }
+          }
+
+          // history.pushState(null, "", `${window.location.pathname}?${getParams(params)}`);
+          // router().render();
+          router().push(`/?${getParams(params)}`);
         }
       },
     },

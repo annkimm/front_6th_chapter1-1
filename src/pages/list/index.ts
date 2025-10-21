@@ -8,6 +8,7 @@ import { router } from "../../router.js";
 import { layout } from "../../components/layout.js";
 import { cartModal, resetCartState } from "../../state/cart.js";
 import { toastMessage } from "../../state/toast.js";
+import { getInitParams } from "../../utils/fetch.js";
 
 // 상태 초기화 로직
 const ensureCleanState = () => {
@@ -21,13 +22,17 @@ const ensureCleanState = () => {
 // 초기 로딩 로직
 const loadInitialProducts = (state: any, getProudcts: any) => {
   if (state.loading && Object.keys(state.pagination).length === 0) {
-    getProudcts({
-      limit: 20,
-      search: "",
-      category1: "",
-      category2: "",
-      sort: "price_asc",
-    });
+    getProudcts(
+      getInitParams()
+        ? getInitParams()
+        : {
+            limit: 20,
+            search: "",
+            category1: "",
+            category2: "",
+            sort: "price_asc",
+          },
+    );
   }
 };
 
@@ -117,6 +122,19 @@ export const productList = () => {
           addCartItem(product);
           openToast("장바구니에 추가되었습니다", "green");
         }
+      },
+    },
+    clickByData: {
+      "data-breadcrumb": (e, element) => {
+        const currentBreadcrumb = element.dataset.breadcrumb;
+
+        getProudcts({
+          limit: state.pagination.limit ?? 20,
+          search: state.search,
+          category1: currentBreadcrumb === "reset" ? "" : state.filters.category1,
+          category2: "",
+          sort: state.filters.sort,
+        });
       },
     },
   })();

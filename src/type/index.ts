@@ -38,3 +38,5 @@ export interface Filters {
   category2: string;
   sort: string;
 }
+
+export type commonObjWithOtherType = { [key: string]: string | number | boolean };
