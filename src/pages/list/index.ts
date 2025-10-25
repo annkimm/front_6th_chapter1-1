@@ -9,15 +9,43 @@ import { layout } from "../../components/layout.js";
 import { cartModal, resetCartState } from "../../state/cart.js";
 import { toastMessage } from "../../state/toast.js";
 import { getInitParams } from "../../utils/fetch.js";
+import { cleanupEventListener, cleanupObserver } from "../../utils/clean.js";
 
-// 상태 초기화 로직
-const ensureCleanState = () => {
-  const root = document.getElementById("root");
-  if (root?.innerHTML === "") {
-    resetProductListState();
+// 전역 observer 관리 (재렌더링 시 이전 observer 정리)
+let globalObserverCleanup: (() => void) | null = null;
+let isEventListenerInitialized = false;
+let globalDOMReadyHandler: (() => void) | null = null;
+let isFirstLoad = true; // 첫 로드 플래그
+
+// 통합 초기화 로직
+const initializeState = (fullReset = false) => {
+  // fullReset이 아닐 때는 조건 확인
+  if (!fullReset) {
+    const root = document.getElementById("root");
+    if (!isFirstLoad && root?.innerHTML !== "") return;
+  }
+
+  // 상태 초기화
+  resetProductListState();
+
+  // observer cleanup
+  cleanupObserver(globalObserverCleanup);
+
+  // fullReset일 때만 추가 cleanup
+  if (fullReset) {
+    cleanupEventListener(globalDOMReadyHandler);
+    isEventListenerInitialized = false;
+    isFirstLoad = true;
+  } else {
     resetCartState();
+    isFirstLoad = false;
   }
 };
+
+// 테스트 환경에서 cleanup 등록
+if (typeof global !== "undefined" && (global as any).registerDomainCleanup) {
+  (global as any).registerDomainCleanup(() => initializeState(true));
+}
 
 // 초기 로딩 로직
 const loadInitialProducts = (state: any, getProudcts: any) => {
@@ -37,12 +65,21 @@ const loadInitialProducts = (state: any, getProudcts: any) => {
 };
 
 export const productList = () => {
+  // IMPORTANT: initializeState must be called BEFORE getting state
+  initializeState();
+
   const { state, getProudcts } = productItemList();
   const { addCartItem } = cartModal();
   const { openToast } = toastMessage();
 
-  ensureCleanState();
   loadInitialProducts(state, getProudcts);
+
+  // 초기 로딩 시에만 스크롤 최상단으로 이동 (무한 스크롤 후 재렌더링 시에는 스크롤 위치 유지)
+  if (state.loading && state.products.length === 0) {
+    setTimeout(() => {
+      window.scrollTo(0, 0);
+    }, 0);
+  }
 
   createEventDelegation({
     input: {
@@ -139,6 +176,73 @@ export const productList = () => {
     },
   })();
 
+  const loadMoreProducts = async () => {
+    // 최신 state와 getProudcts를 다시 가져옴
+    const { state: currentState, getProudcts: currentGetProudcts } = productItemList();
+    await currentGetProudcts(
+      {
+        limit: currentState.pagination.limit ?? 20,
+        search: currentState.search,
+        category1: currentState.filters.category1,
+        category2: currentState.filters.category2,
+        sort: currentState.filters.sort,
+        current: currentState.pagination.page + 1,
+      },
+      true,
+    );
+  };
+
+  const hasMoreProducts = () => {
+    const currentState = productItemList().state;
+    return currentState.products.length < currentState.pagination.total;
+  };
+
+  const setupInfiniteScroll = (loadMoreProducts: () => Promise<void>) => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const target = entries[0];
+        const currentState = productItemList().state;
+        if (target.isIntersecting && !currentState.loading && !currentState.isLoadingMore && hasMoreProducts()) {
+          loadMoreProducts();
+        }
+      },
+      { rootMargin: "100px" }, // 100px 미리 로드
+    );
+
+    // 감시할 요소 (예: 로딩 인디케이터나 마지막 상품)
+    const sentinel = document.querySelector("#products-grid > :last-child");
+    if (sentinel) {
+      observer.observe(sentinel);
+    }
+
+    return () => observer.disconnect(); // 클린업
+  };
+
+  // DOM이 완전히 렌더링된 후 IntersectionObserver 설정
+  const initObserver = () => {
+    // 이전 observer가 있다면 정리
+    if (globalObserverCleanup) {
+      globalObserverCleanup();
+    }
+    // 새로운 observer 설정 및 cleanup 함수 저장
+    globalObserverCleanup = setupInfiniteScroll(loadMoreProducts);
+  };
+
+  // 전역 이벤트 리스너를 한 번만 등록 (중복 등록 방지)
+  if (!isEventListenerInitialized) {
+    isEventListenerInitialized = true;
+
+    // 핸들러를 전역 변수에 저장
+    globalDOMReadyHandler = initObserver;
+
+    // DOMContentLoaded 이벤트 리스너로 observer 설정
+    // 모든 렌더링 후에 자동으로 observer가 재설정됨
+    const root = document.getElementById("root");
+    if (root) {
+      root.addEventListener("DOMContentLoaded", globalDOMReadyHandler);
+    }
+  }
+
   return /*HTML*/ `
     ${layout(
       `<main class="max-w-md mx-auto px-4 py-4">
@@ -159,7 +263,7 @@ export const productList = () => {
               ${state.loading ? skeleton() : state.products.map((product: any) => card(product)).join("")}
             </div>
             ${
-              state.loading
+              state.loading || state.isLoadingMore
                 ? loading()
                 : `<div class="text-center py-4 text-sm text-gray-500">
               모든 상품을 확인했습니다

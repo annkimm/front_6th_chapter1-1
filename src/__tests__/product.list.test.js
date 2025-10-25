@@ -17,6 +17,7 @@ beforeEach(() => goTo("/"));
 
 afterEach(() => {
   // 각 테스트 후 상태 초기화
+  global.cleanupAllObservers(); // IntersectionObserver 정리 및 상태 초기화
   document.getElementById("root").innerHTML = "";
   localStorage.clear();
   server.resetHandlers();
