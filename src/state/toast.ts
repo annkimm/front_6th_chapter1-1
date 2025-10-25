@@ -9,6 +9,7 @@ const createInitialState = () => ({
 
 const createToast = () => {
   let state = createInitialState();
+  let timeoutId: ReturnType<typeof setTimeout> | null = null;
 
   return {
     getState: () => state,
@@ -16,7 +17,20 @@ const createToast = () => {
       state = { ...state, ...newState };
     },
     reset: () => {
+      if (timeoutId !== null) {
+        clearTimeout(timeoutId);
+        timeoutId = null;
+      }
       state = createInitialState();
+    },
+    clearTimeout: () => {
+      if (timeoutId !== null) {
+        clearTimeout(timeoutId);
+        timeoutId = null;
+      }
+    },
+    setTimeoutId: (id: ReturnType<typeof setTimeout>) => {
+      timeoutId = id;
     },
   };
 };
@@ -27,13 +41,17 @@ export const resetCartState = toast.reset;
 
 export const toastMessage = () => {
   const openToast = (message: string, color: string) => {
+    toast.clearTimeout();
+
     toast.setState({ isOpen: true, message, color });
     router().render();
 
-    setTimeout(() => {
+    const id = setTimeout(() => {
       toast.setState({ isOpen: false, message: "", color: "" });
       router().render();
     }, 3000);
+
+    toast.setTimeoutId(id);
   };
 
   return {
