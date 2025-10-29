@@ -82,7 +82,11 @@ export const productItemList = () => {
       const searchParams = getParams(params);
 
       // 여기서 리렌더링!
-      history.pushState(null, "", `${window.location.pathname}?${searchParams}`);
+      history.pushState(
+        null,
+        "",
+        searchParams.length === 0 ? window.location.pathname : `${window.location.pathname}?${searchParams}`,
+      );
 
       router().render();
     } catch (error) {
