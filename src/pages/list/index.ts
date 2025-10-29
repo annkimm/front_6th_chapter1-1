@@ -132,7 +132,7 @@ export const productList = () => {
         if (category1) {
           getProudcts({
             limit: state.pagination.limit,
-            search: state.search,
+            search: state.filters.search,
             category1: category1,
             category2: state.filters.category2,
             sort: state.filters.sort,
@@ -144,7 +144,7 @@ export const productList = () => {
         if (category2) {
           getProudcts({
             limit: state.pagination.limit,
-            search: state.search,
+            search: state.filters.search,
             category1: state.filters.category1,
             category2: category2,
             sort: state.filters.sort,
@@ -167,7 +167,7 @@ export const productList = () => {
 
         getProudcts({
           limit: state.pagination.limit ?? 20,
-          search: state.search,
+          search: state.filters.search,
           category1: currentBreadcrumb === "reset" ? "" : state.filters.category1,
           category2: "",
           sort: state.filters.sort,
