@@ -8,7 +8,7 @@ const routes = {
   "/": { component: productList, reset: resetProductListState },
   "": { component: productList, reset: resetProductListState },
   "/product/:id": { component: productDetail, reset: resetProductState },
-  "/error": errorPage,
+  "/error": { component: errorPage, reset: () => {} },
 };
 
 const getRouteParams = (pathnames: string[]) => {
@@ -67,7 +67,7 @@ export const router = () => {
     } else {
       const { key, params } = getRouteParams(pathnames);
 
-      html = key ? routes[key]["component"](params) : routes["/error"]();
+      html = key ? routes[key]["component"](params) : routes["/error"]["component"]();
     }
 
     // DOM 업데이트
