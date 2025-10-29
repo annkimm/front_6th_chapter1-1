@@ -1,6 +1,6 @@
 import { Product } from "../../type";
 
-export const card = ({ productId, image, title, lprice }: Product) => {
+export const card = ({ productId, image, title, lprice, brand }: Product) => {
   return /*HTML*/ `
               <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden product-card"
                    data-product-id="${productId}">
@@ -17,7 +17,7 @@ export const card = ({ productId, image, title, lprice }: Product) => {
                     <h3 class="text-sm font-medium text-gray-900 line-clamp-2 mb-1">
                       ${title}
                     </h3>
-                    <p class="text-xs text-gray-500 mb-2"></p>
+                    <p class="text-xs text-gray-500 mb-2">${brand}</p>
                     <p class="text-lg font-bold text-gray-900">
                       ${Number(lprice).toLocaleString()}원
                     </p>
