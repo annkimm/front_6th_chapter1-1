@@ -9,8 +9,19 @@ import { layout } from "../../components/layout.ts";
 import { cartModal } from "../../state/cart.ts";
 import { toastMessage } from "../../state/toast.ts";
 import { getParams } from "../../utils/fetch.ts";
+import { Product, ProductItem } from "../../type/index.ts";
 
-const loadInitialProductDetail = (state: any, getProductDetail: any, id: string) => {
+const loadInitialProductDetail = (
+  state: {
+    loading: boolean;
+    loadingRelated: boolean;
+    quantity: number;
+    product: ProductItem;
+    productList: Array<Product>;
+  },
+  getProductDetail: (id: string) => Promise<void>,
+  id: string,
+) => {
   if (Object.keys(state.product).length === 0 || state.product.productId !== id) {
     getProductDetail(id);
   }

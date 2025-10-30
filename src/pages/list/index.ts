@@ -10,6 +10,7 @@ import { cartModal, resetCartState } from "../../state/cart.js";
 import { toastMessage } from "../../state/toast.js";
 import { getInitParams } from "../../utils/fetch.js";
 import { cleanupEventListener, cleanupObserver } from "../../utils/clean.js";
+import { Filters, Pagination, Product } from "../../type/index.js";
 
 // 전역 observer 관리 (재렌더링 시 이전 observer 정리)
 let globalObserverCleanup: (() => void) | null = null;
@@ -48,19 +49,42 @@ if (typeof global !== "undefined" && (global as any).registerDomainCleanup) {
 }
 
 // 초기 로딩 로직
-const loadInitialProducts = (state: any, getProudcts: any) => {
+const loadInitialProducts = (
+  state: {
+    loading: boolean;
+    products: Array<Product>;
+    pagination: Pagination;
+    filters: Filters;
+    categories: {
+      [key: string]: {};
+    };
+    search: string;
+    isLoadingMore: boolean;
+    _loadingLock: boolean;
+  },
+  getProudcts: (
+    params: {
+      limit: number;
+      search: string;
+      category1: string;
+      category2: string;
+      sort: string;
+      current?: number;
+    },
+    isScroll?: boolean,
+  ) => void,
+) => {
   if (state.loading && Object.keys(state.pagination).length === 0) {
-    getProudcts(
-      getInitParams()
-        ? getInitParams()
-        : {
-            limit: 20,
-            search: "",
-            category1: "",
-            category2: "",
-            sort: "price_asc",
-          },
-    );
+    const initParams = getInitParams();
+    const hasParams = Object.keys(initParams).length > 0;
+
+    getProudcts({
+      limit: hasParams && initParams.limit ? Number(initParams.limit) : 20,
+      search: initParams.search || "",
+      category1: initParams.category1 || "",
+      category2: initParams.category2 || "",
+      sort: initParams.sort || "price_asc",
+    });
   }
 };
 
@@ -260,7 +284,7 @@ export const productList = () => {
             }
             <!-- 상품 그리드 -->
             <div class="grid grid-cols-2 gap-4 mb-6" id="products-grid">
-              ${state.loading ? skeleton() : state.products.map((product: any) => card(product)).join("")}
+              ${state.loading ? skeleton() : state.products.map((product: Product) => card(product)).join("")}
             </div>
             ${
               state.loading || state.isLoadingMore
