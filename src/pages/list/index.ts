@@ -62,7 +62,7 @@ const loadInitialProducts = (
     isLoadingMore: boolean;
     _loadingLock: boolean;
   },
-  getProudcts: (
+  getProductList: (
     params: {
       limit?: number | string;
       search?: string;
@@ -78,7 +78,7 @@ const loadInitialProducts = (
     const initParams = getInitParams();
     const hasParams = Object.keys(initParams).length > 0;
 
-    getProudcts(
+    getProductList(
       getInitParams()
         ? getInitParams()
         : {
@@ -96,11 +96,11 @@ export const productList = () => {
   // IMPORTANT: initializeState must be called BEFORE getting state
   initializeState();
 
-  const { state, getProudcts } = productItemList();
+  const { state, getProductList } = productItemList();
   const { addCartItem } = cartModal();
   const { openToast } = toastMessage();
 
-  loadInitialProducts(state, getProudcts);
+  loadInitialProducts(state, getProductList);
 
   // 초기 로딩 시에만 스크롤 최상단으로 이동 (무한 스크롤 후 재렌더링 시에는 스크롤 위치 유지)
   if (state.loading && state.products.length === 0) {
@@ -118,7 +118,7 @@ export const productList = () => {
     keydown: {
       "search-input": (e: KeyboardEvent) => {
         if (e.key === "Enter") {
-          getProudcts({
+          getProductList({
             limit: Number((e.target as HTMLInputElement).value) ?? 20,
             search: state.search,
             category1: state.filters.category1,
@@ -130,7 +130,7 @@ export const productList = () => {
     },
     change: {
       "limit-select": (e: Event) => {
-        getProudcts({
+        getProductList({
           limit: Number((e.target as HTMLInputElement).value) ?? 20,
           search: state.search,
           category1: state.filters.category1,
@@ -139,7 +139,7 @@ export const productList = () => {
         });
       },
       "sort-select": (e: Event) => {
-        getProudcts({
+        getProductList({
           limit: state.pagination.limit,
           search: state.search,
           category1: state.filters.category1,
@@ -158,7 +158,7 @@ export const productList = () => {
       "category1-filter-btn": (_e: Event, element: HTMLElement) => {
         const category1 = (element.closest("[data-category1]") as HTMLElement)?.dataset.category1;
         if (category1) {
-          getProudcts({
+          getProductList({
             limit: state.pagination.limit,
             search: state.filters.search,
             category1: category1,
@@ -170,7 +170,7 @@ export const productList = () => {
       "category2-filter-btn": (_e: Event, element: HTMLElement) => {
         const category2 = (element.closest("[data-category2]") as HTMLElement)?.dataset.category2;
         if (category2) {
-          getProudcts({
+          getProductList({
             limit: state.pagination.limit,
             search: state.filters.search,
             category1: state.filters.category1,
@@ -193,7 +193,7 @@ export const productList = () => {
       "data-breadcrumb": (e, element) => {
         const currentBreadcrumb = element.dataset.breadcrumb;
 
-        getProudcts({
+        getProductList({
           limit: state.pagination.limit ?? 20,
           search: state.filters.search,
           category1: currentBreadcrumb === "reset" ? "" : state.filters.category1,
@@ -206,7 +206,7 @@ export const productList = () => {
 
   const loadMoreProducts = async () => {
     // 최신 state와 getProudcts를 다시 가져옴
-    const { state: currentState, getProudcts: currentGetProudcts } = productItemList();
+    const { state: currentState, getProductList: currentGetProudcts } = productItemList();
     await currentGetProudcts(
       {
         limit: currentState.pagination.limit ?? 20,

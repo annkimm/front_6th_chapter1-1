@@ -33,7 +33,7 @@ const manager = createProductListManager();
 export const resetProductListState = manager.reset;
 
 export const productItemList = () => {
-  const getProudcts = async (
+  const getProductList = async (
     params: {
       limit?: number | string;
       search?: string;
@@ -97,6 +97,6 @@ export const productItemList = () => {
 
   return {
     state: manager.getState(),
-    getProudcts,
+    getProductList,
   };
 };
