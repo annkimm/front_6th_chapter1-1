@@ -64,12 +64,12 @@ const loadInitialProducts = (
   },
   getProudcts: (
     params: {
-      limit: number;
-      search: string;
-      category1: string;
-      category2: string;
-      sort: string;
-      current?: number;
+      limit?: number | string;
+      search?: string;
+      category1?: string;
+      category2?: string;
+      sort?: string;
+      current?: number | string;
     },
     isScroll?: boolean,
   ) => void,
@@ -78,13 +78,17 @@ const loadInitialProducts = (
     const initParams = getInitParams();
     const hasParams = Object.keys(initParams).length > 0;
 
-    getProudcts({
-      limit: hasParams && initParams.limit ? Number(initParams.limit) : 20,
-      search: initParams.search || "",
-      category1: initParams.category1 || "",
-      category2: initParams.category2 || "",
-      sort: initParams.sort || "price_asc",
-    });
+    getProudcts(
+      getInitParams()
+        ? getInitParams()
+        : {
+            limit: 20,
+            search: "",
+            category1: "",
+            category2: "",
+            sort: "price_asc",
+          },
+    );
   }
 };
 

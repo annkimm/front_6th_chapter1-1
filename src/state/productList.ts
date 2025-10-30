@@ -35,12 +35,12 @@ export const resetProductListState = manager.reset;
 export const productItemList = () => {
   const getProudcts = async (
     params: {
-      limit: number;
-      search: string;
-      category1: string;
-      category2: string;
-      sort: string;
-      current?: number;
+      limit?: number | string;
+      search?: string;
+      category1?: string;
+      category2?: string;
+      sort?: string;
+      current?: number | string;
     },
     isScroll?: boolean,
   ) => {
