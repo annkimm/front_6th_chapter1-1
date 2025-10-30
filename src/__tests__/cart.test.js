@@ -10,17 +10,11 @@ const goTo = (path) => {
 
 // 장바구니에 상품을 추가하는 헬퍼 함수
 const addProductToCart = async (productName) => {
-  console.log(1111);
-
   const productElement = await findByText(document.querySelector("#products-grid"), new RegExp(productName, "i"));
   const cartButton = productElement.closest(".product-card").querySelector(".add-to-cart-btn");
   await userEvent.click(cartButton);
 
-  console.log(222);
-
   expect(screen.getByText("장바구니에 추가되었습니다")).toBeInTheDocument();
-
-  console.log(333);
 };
 
 beforeAll(async () => {
@@ -228,24 +222,16 @@ describe.sequential("4. 장바구니 선택 삭제", () => {
     await screen.findByText(/총 의 상품/i);
     screen.getByText("340개");
 
-    console.log("1");
-
     // 두 개의 상품을 장바구니에 추가
     await addProductToCart("pvc 투명 젤리 쇼핑백");
     await addProductToCart("샷시 풍지판");
 
-    console.log("2");
-
     const cartIcon = document.querySelector("#cart-icon-btn");
     await userEvent.click(cartIcon);
-
-    console.log("3");
 
     // 첫 번째 상품만 선택
     const checkboxes = document.querySelectorAll(".cart-item-checkbox");
     expect(checkboxes.length).toBe(2);
-
-    console.log("4");
 
     await userEvent.click(checkboxes[0]);
 
@@ -253,14 +239,11 @@ describe.sequential("4. 장바구니 선택 삭제", () => {
     const selectedDeleteButton = document.querySelector("#cart-modal-remove-selected-btn");
     await userEvent.click(selectedDeleteButton);
 
-    console.log("5");
-
     // 선택된 상품만 삭제되고 나머지는 남아있는지 확인
     await screen.findByText("전체선택 (1개)");
     const cartModal = document.querySelector(".cart-modal");
     expect(queryByText(cartModal, /pvc 투명 젤리 쇼핑백/i)).not.toBeInTheDocument();
     expect(getByText(cartModal, /샷시 풍지판/i)).toBeInTheDocument();
-    console.log("6");
   });
 });
 
@@ -286,8 +269,6 @@ describe.sequential("5. 장바구니 전체 선택", () => {
     // 두 개의 상품을 장바구니에 추가
     await addProductToCart("pvc 투명 젤리 쇼핑백");
     await addProductToCart("고양이 난간 안전망");
-
-    console.log(2);
 
     const cartIcon = document.querySelector("#cart-icon-btn");
     await userEvent.click(cartIcon);
