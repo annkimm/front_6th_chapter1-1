@@ -1,9 +1,15 @@
 import { router } from "../router";
 import { Product } from "../type";
 
+const getLocalData = () => {
+  return localStorage.getItem("shopping_cart") ?? "";
+};
+
 const createInitialState = () => ({
   isOpen: false,
-  productList: [] as Array<{ quantity: number } & Product>,
+  productList: (getLocalData().length > 0 ? JSON.parse(getLocalData()) : []) as unknown as Array<
+    { quantity: number } & Product
+  >,
   checkbox: {} as { [key: string]: boolean },
   isAll: false,
 });
@@ -15,6 +21,7 @@ const createCart = () => {
     getState: () => state,
     setState: (newState: Partial<ReturnType<typeof createInitialState>>) => {
       state = { ...state, ...newState };
+      localStorage.setItem("shopping_cart", JSON.stringify(state.productList));
     },
     reset: () => {
       state = createInitialState();
