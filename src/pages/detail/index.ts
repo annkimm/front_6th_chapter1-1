@@ -1,6 +1,6 @@
 import { loading } from "./loading.ts";
 import { detail } from "./detail.ts";
-import { productItemDetail } from "../../state/proudcDetail.ts";
+import { productItemDetail } from "../../state/productDetail.ts";
 import { breadcrumb } from "./breadcrumb.ts";
 import { products } from "./products.ts";
 import { router } from "../../router.ts";

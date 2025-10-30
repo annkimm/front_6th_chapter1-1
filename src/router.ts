@@ -1,8 +1,8 @@
 import { productList } from "./pages/list/index.js";
 import { productDetail } from "./pages/detail/index.js";
 import { errorPage } from "./pages/error/index.js";
-import { resetProductListState } from "./state/proudctList.js";
-import { resetProductState } from "./state/proudcDetail.js";
+import { resetProductListState } from "./state/productList.js";
+import { resetProductState } from "./state/productDetail.js";
 
 const routes = {
   "/": { component: productList, reset: resetProductListState },

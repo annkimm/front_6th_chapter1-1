@@ -2,7 +2,7 @@ import { card } from "./card.js";
 import { searchBar } from "./searchBar.js";
 import { skeleton } from "../../components/skeleton.js";
 import { loading } from "./loading.js";
-import { productItemList, resetProductListState } from "../../state/proudctList.js";
+import { productItemList, resetProductListState } from "../../state/productList.js";
 import { createEventDelegation } from "../../utils/eventDelegation.js";
 import { router } from "../../router.js";
 import { layout } from "../../components/layout.js";
