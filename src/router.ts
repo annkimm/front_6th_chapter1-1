@@ -84,8 +84,6 @@ export const router = () => {
     window.history.pushState(null, "", path);
     const pathnames = path.split("/");
 
-    console.log(pathnames);
-
     if (routes[path]) {
       routes[path]["reset"]();
     } else {

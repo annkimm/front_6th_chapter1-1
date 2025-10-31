@@ -119,7 +119,7 @@ export const productList = () => {
       "search-input": (e: KeyboardEvent) => {
         if (e.key === "Enter") {
           getProductList({
-            limit: Number((e.target as HTMLInputElement).value) ?? 20,
+            limit: state.pagination.limit ?? 20,
             search: state.search,
             category1: state.filters.category1,
             category2: state.filters.category2,
