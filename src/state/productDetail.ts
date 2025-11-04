@@ -1,6 +1,7 @@
 import { getProduct, getProducts } from "../api/productApi";
 import { router } from "../router";
 import { Product, ProductItem } from "../type";
+import { createStore } from "./baseStore";
 
 const createInitialState = () => ({
   loading: true,
@@ -8,30 +9,29 @@ const createInitialState = () => ({
   quantity: 1,
   product: {} as ProductItem,
   productList: [] as Array<Product>,
+  isFetching: false, // API 호출 중인지 확인하는 flag
 });
 
-const createProductDetail = () => {
-  let state = createInitialState();
+const baseProduct = createStore(createInitialState());
 
-  return {
-    getState: () => state,
-    setState: (newState: Partial<ReturnType<typeof createInitialState>>) => {
-      state = { ...state, ...newState };
-    },
-    reset: () => {
-      state = createInitialState();
-    },
-  };
+const product = {
+  ...baseProduct,
+  reset: () => {
+    // 구독자 알림 없이 상태만 초기화
+    const initialState = createInitialState();
+    const currentState = baseProduct.getState();
+    Object.assign(currentState, initialState);
+  },
 };
 
-const product = createProductDetail();
+export const productStore = product;
 
 export const resetProductState = product.reset;
 
 export const productItemDetail = () => {
   const getProductDetail = async (id: string) => {
     try {
-      product.setState({ loading: true, loadingRelated: true, productList: [] });
+      product.setState({ loading: true, loadingRelated: true, productList: [], isFetching: true });
 
       // 상품 상세 정보 로드
       const productDetail = (await getProduct(id)) as ProductItem;
@@ -39,7 +39,7 @@ export const productItemDetail = () => {
         loading: false,
         product: productDetail,
       });
-      router().render();
+      // router().render();
 
       // 관련 상품 로드
       if (productDetail.category1) {
@@ -54,9 +54,10 @@ export const productItemDetail = () => {
         product.setState({
           loadingRelated: false,
           productList: ((products.products ?? []) as Array<Product>).filter((item) => item.productId !== id),
+          isFetching: false,
         });
 
-        router().render();
+        // router().render();
       }
     } catch (error) {
       router().push("/error");

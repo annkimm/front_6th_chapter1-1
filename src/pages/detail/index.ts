@@ -18,10 +18,16 @@ const loadInitialProductDetail = (
     quantity: number;
     product: ProductItem;
     productList: Array<Product>;
+    isFetching: boolean;
   },
   getProductDetail: (id: string) => Promise<void>,
   id: string,
 ) => {
+  // 이미 API 호출 중이면 다시 호출하지 않음 (무한 루프 방지)
+  if (state.isFetching) {
+    return;
+  }
+
   if (Object.keys(state.product).length === 0 || state.product.productId !== id) {
     getProductDetail(id);
   }
@@ -70,12 +76,12 @@ export const productDetail = (id: string) => {
     click: {
       "quantity-increase": (e: Event) => {
         setState({ quantity: state.quantity + 1 });
-        router().render();
+        // router().render();
       },
       "quantity-decrease": (e: Event) => {
         const decreaseQuantity = state.quantity - 1;
         setState({ quantity: decreaseQuantity === 0 ? 1 : decreaseQuantity });
-        router().render();
+        // router().render();
       },
       "add-to-cart-btn": (e: Event) => {
         addCartItem(state.product);

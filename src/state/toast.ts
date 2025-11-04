@@ -1,5 +1,4 @@
-import { router } from "../router";
-import { Product } from "../type";
+import { createStore } from "./baseStore";
 
 const createInitialState = () => ({
   isOpen: false,
@@ -7,36 +6,32 @@ const createInitialState = () => ({
   message: "",
 });
 
-const createToast = () => {
-  let state = createInitialState();
-  let timeoutId: ReturnType<typeof setTimeout> | null = null;
+// ✅ baseStore 사용 - timeout 관리는 별도로
+const baseToast = createStore(createInitialState());
+let timeoutId: ReturnType<typeof setTimeout> | null = null;
 
-  return {
-    getState: () => state,
-    setState: (newState: Partial<ReturnType<typeof createInitialState>>) => {
-      state = { ...state, ...newState };
-    },
-    reset: () => {
-      if (timeoutId !== null) {
-        clearTimeout(timeoutId);
-        timeoutId = null;
-      }
-      state = createInitialState();
-    },
-    clearTimeout: () => {
-      if (timeoutId !== null) {
-        clearTimeout(timeoutId);
-        timeoutId = null;
-      }
-    },
-    setTimeoutId: (id: ReturnType<typeof setTimeout>) => {
-      timeoutId = id;
-    },
-  };
+const toast = {
+  ...baseToast,
+  clearTimeout: () => {
+    if (timeoutId !== null) {
+      clearTimeout(timeoutId);
+      timeoutId = null;
+    }
+  },
+  setTimeoutId: (id: ReturnType<typeof setTimeout>) => {
+    timeoutId = id;
+  },
+  reset: () => {
+    if (timeoutId !== null) {
+      clearTimeout(timeoutId);
+      timeoutId = null;
+    }
+    baseToast.reset();
+  },
 };
 
-const toast = createToast();
-
+// ✅ router가 구독할 수 있도록 export
+export const toastStore = toast;
 export const resetCartState = toast.reset;
 
 export const toastMessage = () => {
@@ -44,11 +39,9 @@ export const toastMessage = () => {
     toast.clearTimeout();
 
     toast.setState({ isOpen: true, message, color });
-    router().render();
 
     const id = setTimeout(() => {
       toast.setState({ isOpen: false, message: "", color: "" });
-      router().render();
     }, 3000);
 
     toast.setTimeoutId(id);

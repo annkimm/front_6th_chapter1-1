@@ -1,5 +1,6 @@
 import { router } from "../router";
 import { Product } from "../type";
+import { createStore } from "./baseStore";
 
 const getLocalData = () => {
   return localStorage.getItem("shopping_cart") ?? "";
@@ -14,22 +15,27 @@ const createInitialState = () => ({
   isAll: false,
 });
 
-const createCart = () => {
-  let state = createInitialState();
+const baseCart = createStore(createInitialState());
 
-  return {
-    getState: () => state,
-    setState: (newState: Partial<ReturnType<typeof createInitialState>>) => {
-      state = { ...state, ...newState };
-      localStorage.setItem("shopping_cart", JSON.stringify(state.productList));
-    },
-    reset: () => {
-      state = createInitialState();
-    },
-  };
+const cart = {
+  ...baseCart,
+  setState: (newState: Partial<ReturnType<typeof createInitialState>>) => {
+    baseCart.setState(newState);
+
+    const currentState = baseCart.getState();
+    localStorage.setItem("shopping_cart", JSON.stringify(currentState.productList));
+  },
+  reset: () => {
+    // 구독자 알림 없이 상태만 초기화 (무한 루프 방지)
+    const initialState = createInitialState();
+    const currentState = baseCart.getState();
+
+    // 직접 상태 업데이트 (listeners 호출 안 함)
+    Object.assign(currentState, initialState);
+  },
 };
 
-const cart = createCart();
+export const cartStore = cart;
 
 export const resetCartState = cart.reset;
 
@@ -37,7 +43,6 @@ export const cartModal = () => {
   const openCartModal = () => {
     const state = cart.getState();
     cart.setState({ isOpen: !state.isOpen, checkbox: {}, isAll: false });
-    router().render();
   };
 
   const addCartItem = (product: Product) => {
@@ -50,8 +55,6 @@ export const cartModal = () => {
           )
         : [...state.productList, { ...product, quantity: 1 }];
     cart.setState({ productList });
-
-    router().render();
   };
 
   const deleteCartItem = (productId: string) => {
@@ -61,14 +64,10 @@ export const cartModal = () => {
     const checkbox = Object.fromEntries(entries);
 
     cart.setState({ productList, checkbox });
-
-    router().render();
   };
 
   const deleteAllCartItem = () => {
     cart.setState({ productList: [], checkbox: {} });
-
-    router().render();
   };
 
   const decreaseQuantity = (productId: string) => {
@@ -78,7 +77,6 @@ export const cartModal = () => {
     );
 
     cart.setState({ productList });
-    router().render();
   };
 
   const increaseQuantity = (productId: string) => {
@@ -88,7 +86,6 @@ export const cartModal = () => {
     );
 
     cart.setState({ productList });
-    router().render();
   };
 
   const setCheckBox = (productId: string) => {
@@ -98,8 +95,6 @@ export const cartModal = () => {
       : { ...state.checkbox, [productId]: true };
 
     cart.setState({ checkbox });
-
-    router().render();
   };
 
   const deletePartCart = () => {
@@ -107,8 +102,6 @@ export const cartModal = () => {
     const productList = state.productList.filter((item) => !state.checkbox[item.productId]);
 
     cart.setState({ productList });
-
-    router().render();
   };
 
   const setAllCheckbox = () => {
@@ -121,8 +114,6 @@ export const cartModal = () => {
     }, {});
 
     cart.setState({ checkbox, isAll });
-
-    router().render();
   };
 
   return {
