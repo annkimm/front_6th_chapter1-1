@@ -96,5 +96,14 @@ export const router = () => {
     render(path);
   };
 
-  return { render, push };
+  /**
+   * ✅ store를 구독 - 상태 변경시 자동 렌더링
+   */
+  const subscribeToStore = (store: { subscribe: (listener: () => void) => () => void }) => {
+    return store.subscribe(() => {
+      render();
+    });
+  };
+
+  return { render, push, subscribeToStore };
 };
