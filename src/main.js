@@ -2,6 +2,7 @@ import { router } from "./router.ts";
 import { toastStore } from "./state/toast.ts";
 import { cartStore } from "./state/cart.ts";
 import { productStore } from "./state/productDetail.ts";
+import { productListStore } from "./state/productList.ts";
 
 const enableMocking = () =>
   import("./mocks/browser.js").then(({ worker }) =>
@@ -18,12 +19,11 @@ function main() {
     root.innerHTML = appRouter.render();
   }
 
-  // ✅ toast 구독 - toast 상태 변경시 자동 렌더링
+  // ✅ 구독 - 상태 변경시 자동 렌더링
   appRouter.subscribeToStore(toastStore);
-  // ✅ cart 구독 - cart 상태 변경시 자동 렌더링
   appRouter.subscribeToStore(cartStore);
-
   appRouter.subscribeToStore(productStore);
+  appRouter.subscribeToStore(productListStore);
 
   // popstate 이벤트 리스너 등록 (뒤로가기/앞으로가기, 테스트의 goTo 지원)
   window.addEventListener("popstate", () => {

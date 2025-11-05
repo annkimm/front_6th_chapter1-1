@@ -2,6 +2,7 @@ import { getCategories, getProducts } from "../api/productApi";
 import { router } from "../router";
 import { Filters, Pagination, Product } from "../type";
 import { getParams } from "../utils/fetch";
+import { createStore } from "./baseStore";
 
 const createInitialState = () => ({
   loading: true,
@@ -11,28 +12,67 @@ const createInitialState = () => ({
   categories: {} as { [key: string]: {} },
   search: "",
   isLoadingMore: false,
-  _loadingLock: false, // 중복 로딩 방지용 플래그
+  _loadingLock: false, // 무한 스크롤 중복 방지용 플래그
+  isFirstFetching: true,
 });
 
-const createProductListManager = () => {
-  let state = createInitialState();
+const baseProductList = createStore(createInitialState());
 
-  return {
-    getState: () => state,
-    setState: (newState: Partial<ReturnType<typeof createInitialState>>) => {
-      state = { ...state, ...newState };
-    },
-    reset: () => {
-      state = createInitialState();
-    },
-  };
+const productListManager = {
+  ...baseProductList,
+  reset: () => {
+    // 구독자 알림 없이 상태만 초기화 (무한 루프 방지)
+    const initialState = createInitialState();
+    const currentState = baseProductList.getState();
+    Object.assign(currentState, initialState);
+  },
 };
 
-const manager = createProductListManager();
+export const productListStore = productListManager;
 
-export const resetProductListState = manager.reset;
+export const resetProductListState = productListManager.reset;
 
 export const productItemList = () => {
+  const getInitProductList = async (params: {
+    limit?: number | string;
+    search?: string;
+    category1?: string;
+    category2?: string;
+    sort?: string;
+    current?: number | string;
+  }) => {
+    // 한 번의 setState로 모든 상태 업데이트 (불필요한 리렌더링 방지)
+
+    try {
+      const result = await getProducts(params);
+      const categories = await getCategories();
+      const newProducts = result.products;
+
+      productListManager.setState({
+        loading: false,
+        products: newProducts,
+        pagination: result.pagination,
+        filters: result.filters,
+        categories: categories,
+        isFirstFetching: false,
+      });
+
+      const searchParams = getParams(params);
+
+      // URL 업데이트
+      history.pushState(
+        null,
+        "",
+        searchParams.length === 0 ? window.location.pathname : `${window.location.pathname}?${searchParams}`,
+      );
+
+      // setState가 구독자에게 알림 → 자동 렌더링
+    } catch (error) {
+      productListManager.setState({ _loadingLock: false });
+      router().render("/error");
+    }
+  };
+
   const getProductList = async (
     params: {
       limit?: number | string;
@@ -44,21 +84,18 @@ export const productItemList = () => {
     },
     isScroll?: boolean,
   ) => {
+    const state = productListManager.getState();
+
     // 중복 호출 방지
-    if (isScroll && manager.getState()._loadingLock) {
+    if (isScroll && state._loadingLock) {
       return;
     }
 
-    if (isScroll) {
-      manager.setState({ _loadingLock: true });
-    }
-
-    manager.setState({ [isScroll ? "isLoadingMore" : "loading"]: true });
-
-    // 로딩 상태를 즉시 UI에 반영
-    if (isScroll) {
-      router().render();
-    }
+    // 한 번의 setState로 모든 상태 업데이트 (불필요한 리렌더링 방지)
+    productListManager.setState({
+      [isScroll ? "isLoadingMore" : "loading"]: true,
+      ...(isScroll ? { _loadingLock: true } : {}),
+    });
 
     try {
       const result = await getProducts(params);
@@ -68,9 +105,10 @@ export const productItemList = () => {
         categories = await getCategories();
       }
 
-      const newProducts = isScroll ? [...manager.getState().products, ...result.products] : result.products;
+      const currentState = productListManager.getState();
+      const newProducts = isScroll ? [...currentState.products, ...result.products] : result.products;
 
-      manager.setState({
+      productListManager.setState({
         [isScroll ? "isLoadingMore" : "loading"]: false,
         products: newProducts,
         pagination: result.pagination,
@@ -81,22 +119,23 @@ export const productItemList = () => {
 
       const searchParams = getParams(params);
 
-      // 여기서 리렌더링!
+      // URL 업데이트
       history.pushState(
         null,
         "",
         searchParams.length === 0 ? window.location.pathname : `${window.location.pathname}?${searchParams}`,
       );
 
-      router().render();
+      // setState가 구독자에게 알림 → 자동 렌더링
     } catch (error) {
-      manager.setState({ _loadingLock: false });
+      productListManager.setState({ _loadingLock: false });
       router().render("/error");
     }
   };
 
   return {
-    state: manager.getState(),
+    getState: () => productListManager.getState(), // 함수로 반환하여 항상 최신 state 가져오기
     getProductList,
+    getInitProductList,
   };
 };

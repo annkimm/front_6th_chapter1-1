@@ -16,14 +16,14 @@ import { Filters, Pagination, Product } from "../../type/index.js";
 let globalObserverCleanup: (() => void) | null = null;
 let isEventListenerInitialized = false;
 let globalDOMReadyHandler: (() => void) | null = null;
-let isFirstLoad = true; // 첫 로드 플래그
+let isFirstLanding = true; // 첫 로드 플래그
 
 // 통합 초기화 로직
 const initializeState = (fullReset = false) => {
   // fullReset이 아닐 때는 조건 확인
   if (!fullReset) {
     const root = document.getElementById("root");
-    if (!isFirstLoad && root?.innerHTML !== "") return;
+    if (!isFirstLanding && root?.innerHTML !== "") return;
   }
 
   // 상태 초기화
@@ -36,10 +36,10 @@ const initializeState = (fullReset = false) => {
   if (fullReset) {
     cleanupEventListener(globalDOMReadyHandler);
     isEventListenerInitialized = false;
-    isFirstLoad = true;
+    isFirstLanding = true;
   } else {
     resetCartState();
-    isFirstLoad = false;
+    isFirstLanding = false;
   }
 };
 
@@ -50,34 +50,28 @@ if (typeof global !== "undefined" && (global as any).registerDomainCleanup) {
 
 // 초기 로딩 로직
 const loadInitialProducts = (
-  state: {
-    loading: boolean;
-    products: Array<Product>;
+  getState: () => {
     pagination: Pagination;
-    filters: Filters;
-    categories: {
-      [key: string]: {};
-    };
-    search: string;
-    isLoadingMore: boolean;
-    _loadingLock: boolean;
+    isFirstFetching: boolean;
   },
-  getProductList: (
-    params: {
-      limit?: number | string;
-      search?: string;
-      category1?: string;
-      category2?: string;
-      sort?: string;
-      current?: number | string;
-    },
-    isScroll?: boolean,
-  ) => void,
+  getProductList: (params: {
+    limit?: number | string;
+    search?: string;
+    category1?: string;
+    category2?: string;
+    sort?: string;
+    current?: number | string;
+  }) => void,
 ) => {
-  if (state.loading && Object.keys(state.pagination).length === 0) {
-    const initParams = getInitParams();
-    const hasParams = Object.keys(initParams).length > 0;
+  // 항상 최신 state를 가져옴
+  const state = getState();
 
+  if (!state.isFirstFetching) {
+    return;
+  }
+
+  if (state.isFirstFetching && Object.keys(state.pagination).length === 0) {
+    console.log("c");
     getProductList(
       getInitParams()
         ? getInitParams()
@@ -96,11 +90,13 @@ export const productList = () => {
   // IMPORTANT: initializeState must be called BEFORE getting state
   initializeState();
 
-  const { state, getProductList } = productItemList();
+  const { getState, getProductList, getInitProductList } = productItemList();
   const { addCartItem } = cartModal();
   const { openToast } = toastMessage();
 
-  loadInitialProducts(state, getProductList);
+  loadInitialProducts(getState, getInitProductList);
+
+  const state = getState(); // 렌더링을 위해 현재 state 가져오기
 
   // 초기 로딩 시에만 스크롤 최상단으로 이동 (무한 스크롤 후 재렌더링 시에는 스크롤 위치 유지)
   if (state.loading && state.products.length === 0) {
@@ -206,7 +202,8 @@ export const productList = () => {
 
   const loadMoreProducts = async () => {
     // 최신 state와 getProudcts를 다시 가져옴
-    const { state: currentState, getProductList: currentGetProudcts } = productItemList();
+    const { getState, getProductList: currentGetProudcts } = productItemList();
+    const currentState = getState();
     await currentGetProudcts(
       {
         limit: currentState.pagination.limit ?? 20,
@@ -221,7 +218,7 @@ export const productList = () => {
   };
 
   const hasMoreProducts = () => {
-    const currentState = productItemList().state;
+    const currentState = productItemList().getState();
     return currentState.products.length < currentState.pagination.total;
   };
 
@@ -229,7 +226,7 @@ export const productList = () => {
     const observer = new IntersectionObserver(
       (entries) => {
         const target = entries[0];
-        const currentState = productItemList().state;
+        const currentState = productItemList().getState();
         if (target.isIntersecting && !currentState.loading && !currentState.isLoadingMore && hasMoreProducts()) {
           loadMoreProducts();
         }
