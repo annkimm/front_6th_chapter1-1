@@ -27,6 +27,7 @@ const registeredHandlers: {
 };
 
 let globalInitialized = false;
+let abortController = new AbortController();
 
 const initializeGlobalListeners = () => {
   if (globalInitialized) return;
@@ -101,10 +102,11 @@ export const createEventDelegation = (handlers: EventHandlers) => {
       Object.entries(handlers.click).forEach(([id, handler]) => {
         registeredHandlers.click.set(id, handler);
 
+        // 테스트 환경 userEvent.click 지원 - AbortController로 cleanup
         document.querySelectorAll(`#${id}`).forEach((element) => {
           if (!element.hasAttribute("data-click-attached")) {
             element.setAttribute("data-click-attached", "true");
-            element.addEventListener("click", (e) => handler(e));
+            element.addEventListener("click", (e) => handler(e), { signal: abortController.signal });
           }
         });
       });
@@ -114,11 +116,13 @@ export const createEventDelegation = (handlers: EventHandlers) => {
       Object.entries(handlers.clickByClass).forEach(([className, handler]) => {
         registeredHandlers.clickByClass.set(className, handler);
 
-        // 테스트 환경 userEvent.click 지원
+        // 테스트 환경 userEvent.click 지원 - AbortController로 cleanup
         document.querySelectorAll(`.${className}`).forEach((element) => {
           if (!element.hasAttribute("data-click-attached")) {
             element.setAttribute("data-click-attached", "true");
-            element.addEventListener("click", (e) => handler(e, element as HTMLElement));
+            element.addEventListener("click", (e) => handler(e, element as HTMLElement), {
+              signal: abortController.signal,
+            });
           }
         });
       });
@@ -128,11 +132,13 @@ export const createEventDelegation = (handlers: EventHandlers) => {
       Object.entries(handlers.clickByData).forEach(([dataAttr, handler]) => {
         registeredHandlers.clickByData.set(dataAttr, handler);
 
-        // 테스트 환경 userEvent.click 지원
+        // 테스트 환경 userEvent.click 지원 - AbortController로 cleanup
         document.querySelectorAll(`[${dataAttr}]`).forEach((element) => {
           if (!element.hasAttribute("data-click-attached")) {
             element.setAttribute("data-click-attached", "true");
-            element.addEventListener("click", (e) => handler(e, element as HTMLElement));
+            element.addEventListener("click", (e) => handler(e, element as HTMLElement), {
+              signal: abortController.signal,
+            });
           }
         });
       });
@@ -148,4 +154,10 @@ export const createEventDelegation = (handlers: EventHandlers) => {
       registeredHandlers.globalKeydown = handlers.globalKeydown;
     }
   };
+};
+
+// 이벤트 리스너 정리 함수
+export const cleanupEventDelegationListeners = () => {
+  abortController.abort();
+  abortController = new AbortController();
 };

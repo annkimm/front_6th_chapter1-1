@@ -10,7 +10,8 @@ import { cartModal, resetCartState } from "../../state/cart.js";
 import { toastMessage } from "../../state/toast.js";
 import { getInitParams } from "../../utils/fetch.js";
 import { cleanupEventListener, cleanupObserver } from "../../utils/clean.js";
-import { Filters, Pagination, Product } from "../../type/index.js";
+import { cleanupEventDelegationListeners } from "../../utils/eventDelegation.js";
+import { Pagination, Product } from "../../type/index.js";
 
 // 전역 observer 관리 (재렌더링 시 이전 observer 정리)
 let globalObserverCleanup: (() => void) | null = null;
@@ -35,6 +36,7 @@ const initializeState = (fullReset = false) => {
   // fullReset일 때만 추가 cleanup
   if (fullReset) {
     cleanupEventListener(globalDOMReadyHandler);
+    cleanupEventDelegationListeners(); // 이벤트 리스너 정리
     isEventListenerInitialized = false;
     isFirstLanding = true;
   } else {
