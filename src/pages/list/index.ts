@@ -11,7 +11,7 @@ import { toastMessage } from "../../state/toast.js";
 import { getInitParams } from "../../utils/fetch.js";
 import { cleanupEventListener, cleanupObserver } from "../../utils/clean.js";
 import { cleanupEventDelegationListeners } from "../../utils/eventDelegation.js";
-import { Pagination, Product } from "../../type/index.js";
+import { Pagination, Product, TestGlobal } from "../../type/index.js";
 
 // 전역 observer 관리 (재렌더링 시 이전 observer 정리)
 let globalObserverCleanup: (() => void) | null = null;
@@ -46,8 +46,9 @@ const initializeState = (fullReset = false) => {
 };
 
 // 테스트 환경에서 cleanup 등록
-if (typeof global !== "undefined" && (global as any).registerDomainCleanup) {
-  (global as any).registerDomainCleanup(() => initializeState(true));
+if (typeof globalThis !== "undefined" && "registerDomainCleanup" in globalThis) {
+  const testGlobal = globalThis as unknown as TestGlobal;
+  testGlobal.registerDomainCleanup?.(() => initializeState(true));
 }
 
 // 초기 로딩 로직

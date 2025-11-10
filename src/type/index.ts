@@ -40,3 +40,8 @@ export interface Filters {
 }
 
 export type commonObjWithOtherType = { [key: string]: string | number | boolean };
+
+// 테스트 환경 global 타입 정의
+export interface TestGlobal {
+  registerDomainCleanup?: (cleanup: () => void) => void;
+}
