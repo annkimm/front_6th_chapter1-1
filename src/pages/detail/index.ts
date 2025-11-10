@@ -34,9 +34,10 @@ const loadInitialProductDetail = (
 };
 
 export const productDetail = (id: string) => {
-  const { state, getProductDetail, setState } = productItemDetail();
+  const { getState, getProductDetail, setState } = productItemDetail();
   const { addCartItem } = cartModal();
   const { openToast } = toastMessage();
+  const state = getState();
 
   loadInitialProductDetail(state, getProductDetail, id);
 

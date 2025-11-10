@@ -1,4 +1,3 @@
-import { router } from "../router";
 import { Product } from "../type";
 import { createStore } from "./baseStore";
 
@@ -117,7 +116,7 @@ export const cartModal = () => {
   };
 
   return {
-    state: cart.getState(),
+    getState: () => cart.getState(),
     openCartModal,
     addCartItem,
     deleteCartItem,

@@ -48,7 +48,7 @@ export const toastMessage = () => {
   };
 
   return {
-    state: toast.getState(),
+    getState: () => toast.getState(),
     openToast,
   };
 };

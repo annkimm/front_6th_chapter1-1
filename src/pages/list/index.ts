@@ -71,7 +71,6 @@ const loadInitialProducts = (
   }
 
   if (state.isFirstFetching && Object.keys(state.pagination).length === 0) {
-    console.log("c");
     getProductList(
       getInitParams()
         ? getInitParams()

@@ -7,11 +7,10 @@ import { header } from "./header";
 import { toast } from "./toast/toast";
 
 export const layout = (child: string, isDetail?: boolean) => {
-  const {
-    state: { isOpen, productList },
-    openCartModal,
-  } = cartModal();
-  const { state: toastState } = toastMessage();
+  const { getState: getCartState, openCartModal } = cartModal();
+  const { getState: getToastState } = toastMessage();
+  const { isOpen, productList } = getCartState();
+  const toastState = getToastState();
 
   createEventDelegation({
     globalKeydown: (e: KeyboardEvent) => {

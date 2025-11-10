@@ -4,7 +4,7 @@ import { empty } from "./empty";
 
 export const cart = () => {
   const {
-    state: { productList, checkbox, isAll },
+    getState,
     deleteCartItem,
     deleteAllCartItem,
     increaseQuantity,
@@ -13,6 +13,7 @@ export const cart = () => {
     setAllCheckbox,
     deletePartCart,
   } = cartModal();
+  const { productList, checkbox, isAll } = getState();
   const totalPrice = productList.reduce((sum, { lprice, quantity }) => sum + Number(lprice) * Number(quantity), 0);
   const selectedTotalPrice = productList.reduce(
     (sum, { lprice, quantity, productId }) => sum + (checkbox[productId] ? Number(lprice) * Number(quantity) : 0),

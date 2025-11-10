@@ -65,7 +65,7 @@ export const productItemDetail = () => {
   };
 
   return {
-    state: product.getState(),
+    getState: () => product.getState(),
     getProductDetail,
     setState: product.setState,
   };
